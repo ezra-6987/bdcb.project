@@ -84,6 +84,8 @@ startButton.addEventListener("click", startGame);
 
 function startGame() {
 
+    console.log("Start clicked");
+
     currentCard = 0;
 
     score = 0;
@@ -123,6 +125,9 @@ function startGame() {
 
     drawBelt();
 
+    belt.style.transition = "none";
+    
+    belt.style.transform = "translateX(0)";
 
     // Start countdown
 
@@ -136,6 +141,8 @@ function startGame() {
 // =====================================================
 
 function drawBelt() {
+
+    console.log("Drawing belt");
 
     belt.innerHTML = "";
 
@@ -160,23 +167,19 @@ function drawBelt() {
         }
 
 
+        const slot = document.createElement("div");
+        slot.className = "slot";
+        
         const card = document.createElement("div");
-
-        card.classList.add("assetCard");
-
+        card.className = "assetCard";
 
         card.innerHTML = `
-
-            <img
-                src="${item.image}"
-                alt="${item.name}"
-            >
-
-            <h3>
-                ${item.name}
-            </h3>
-
+            <img src="${item.image}" alt="${item.name}">
+            <div class="cardTitle">${item.name}</div>
         `;
+
+        slot.appendChild(card);
+        belt.appendChild(slot);
 
 
         // ONLY the first card is draggable
@@ -203,9 +206,6 @@ function drawBelt() {
             card.classList.add("previewAsset");
 
         }
-
-
-        belt.appendChild(card);
 
     }
 
@@ -486,8 +486,11 @@ function moveBelt() {
 
     // Move entire train left
 
-    belt.style.transform =
-        `translateX(-${moveDistance}px)`;
+    const movingConveyor =
+    document.getElementById("movingConveyor");
+
+    movingConveyor.style.transform =
+    `translateX(-${moveDistance}px)`;
 
 
     setTimeout(() => {
