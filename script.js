@@ -142,35 +142,21 @@ function startGame() {
 
 function drawBelt() {
 
-    console.log("Drawing belt");
+    const slots = document.querySelectorAll(".slot");
 
-    belt.innerHTML = "";
-
-    belt.style.transition = "none";
-
-    belt.style.transform = "translateX(0)";
-
+    // Clear previous cards
+    slots.forEach(slot => {
+        slot.innerHTML = "";
+    });
 
     for (let i = 0; i < 5; i++) {
 
-        const assetIndex = currentCard + i;
+        const item = assets[currentCard + i];
 
-        const item = assets[assetIndex];
+        if (!item) continue;
 
-
-        // No more cards
-
-        if (!item) {
-
-            break;
-
-        }
-
-
-        const slot = document.createElement("div");
-        slot.className = "slot";
-        
         const card = document.createElement("div");
+
         card.className = "assetCard";
 
         card.innerHTML = `
@@ -178,12 +164,7 @@ function drawBelt() {
             <div class="cardTitle">${item.name}</div>
         `;
 
-        slot.appendChild(card);
-        belt.appendChild(slot);
-
-
-        // ONLY the first card is draggable
-
+        // Only first card can be dragged
         if (i === 0) {
 
             card.classList.add("currentAsset");
@@ -192,10 +173,7 @@ function drawBelt() {
 
             card.dataset.category = item.category;
 
-            card.addEventListener(
-                "dragstart",
-                dragStart
-            );
+            card.addEventListener("dragstart", dragStart);
 
         }
 
@@ -207,9 +185,15 @@ function drawBelt() {
 
         }
 
+        slots[i].appendChild(card);
+
+        }
+
+        
+
     }
 
-}
+
 
 // =====================================================
 // DRAG START
@@ -697,7 +681,9 @@ function restartGame() {
     isMoving = false;
 
 
-    belt.innerHTML = "";
+    document.querySelectorAll(".slot").forEach(slot=>{
+    slot.innerHTML="";
+    });
 
 
     scoreDisplay.innerHTML =
