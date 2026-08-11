@@ -62,7 +62,7 @@ const assets = [
 // GAME VARIABLES
 // =====================================================
 
-let currentCard = 0;
+let activeAssets = [];
 
 let score = 0;
 
@@ -81,12 +81,20 @@ let isMoving = false;
 
 startButton.addEventListener("click", startGame);
 
+function shuffleAssets(array) {
+
+    return [...array].sort(
+        () => Math.random() - 0.5
+    );
+
+}
+
 
 function startGame() {
 
     console.log("Start clicked");
 
-    currentCard = 0;
+    activeAssets = shuffleAssets(assets);
 
     score = 0;
 
@@ -142,56 +150,55 @@ function startGame() {
 
 function drawBelt() {
 
-    const slots = document.querySelectorAll(".slot");
+    const slots =
+        document.querySelectorAll(".slot");
 
-    // Clear previous cards
+    // Clear the five slots
     slots.forEach(slot => {
         slot.innerHTML = "";
     });
 
-    for (let i = 0; i < 5; i++) {
+    // Put active assets into the slots
+    for (let i = 0; i < slots.length; i++) {
 
-        const item = assets[currentCard + i];
+        const item = activeAssets[i];
 
-        if (!item) continue;
+        if (!item) {
+            continue;
+        }
 
-        const card = document.createElement("div");
+        const card =
+            document.createElement("div");
 
         card.className = "assetCard";
 
+        card.draggable = true;
+
+        card.dataset.index = i;
+
+        card.dataset.category =
+            item.category;
+
         card.innerHTML = `
-            <img src="${item.image}" alt="${item.name}">
-            <div class="cardTitle">${item.name}</div>
+            <img
+                src="${item.image}"
+                alt="${item.name}"
+            >
+
+            <div class="cardTitle">
+                ${item.name}
+            </div>
         `;
 
-        // Only first card can be dragged
-        if (i === 0) {
-
-            card.classList.add("currentAsset");
-
-            card.draggable = true;
-
-            card.dataset.category = item.category;
-
-            card.addEventListener("dragstart", dragStart);
-
-        }
-
-        else {
-
-            card.draggable = false;
-
-            card.classList.add("previewAsset");
-
-        }
+        card.addEventListener(
+            "dragstart",
+            dragStart
+        );
 
         slots[i].appendChild(card);
-
-        }
-
-        
-
     }
+
+}
 
 
 
@@ -206,20 +213,29 @@ function dragStart(event) {
         event.preventDefault();
 
         return;
-
     }
 
-    const category =
-        event.currentTarget.dataset.category;
+    const card =
+        event.currentTarget;
 
+    const category =
+        card.dataset.category;
+
+    const index =
+        card.dataset.index;
 
     event.dataTransfer.setData(
-        "text/plain",
+        "category",
         category
     );
 
+    event.dataTransfer.setData(
+        "index",
+        index
+    );
 
-    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.effectAllowed =
+        "move";
 
 }
 
@@ -279,29 +295,35 @@ function checkAnswer(event) {
     event.preventDefault();
 
     if (isMoving) {
-
         return;
-
     }
-
 
     this.classList.remove("active");
 
-
     const answer =
-        event.dataTransfer.getData("text/plain");
+        event.dataTransfer.getData(
+            "category"
+        );
 
+    const assetIndex =
+        Number(
+            event.dataTransfer.getData(
+                "index"
+            )
+        );
 
     const chosenCategory =
         this.dataset.category;
 
-
     if (answer === chosenCategory) {
 
-        correct(this);
+        correct(
+            assetIndex,
+            this
+        );
+
 
     }
-
     else {
 
         wrong();
@@ -310,59 +332,69 @@ function checkAnswer(event) {
 
 }
 
-// =====================================================
-// CORRECT ANSWER
-// =====================================================
+function removeAsset(index) {
 
-function correct(folder) {
+    activeAssets.splice(index, 1);
 
-    if (isMoving) {
+    // All assets have been sorted
+    if (activeAssets.length === 0) {
+
+        clearInterval(timer);
+
+        isMoving = true;
+
+        finishGame();
 
         return;
 
     }
 
+    // There are still assets remaining
+    drawBelt();
+
+    isMoving = false;
+
+}
+
+// =====================================================
+// CORRECT ANSWER
+// =====================================================
+
+function correct(assetIndex, folder) {
+
+    if (isMoving) {
+        return;
+    }
 
     isMoving = true;
 
-
-    // Bounce correct folder
-
     folder.classList.add("bounce");
-
-
-    // Message
 
     showMessage(
         "✔ Correct",
         "#5CFF5C"
     );
 
-
-    // Confetti
-
     confetti();
 
-
-    // Increase score
-
     score++;
-
 
     scoreDisplay.innerHTML =
         score + " / " + assets.length;
 
-
     setTimeout(() => {
 
-        folder.classList.remove("bounce");
+        folder.classList.remove(
+            "bounce"
+        );
 
     }, 400);
 
+    setTimeout(() => {
 
-    // Move film strip
+        removeAsset(assetIndex);
 
-    moveBelt();
+    }, 450);
 
 }
 
@@ -373,136 +405,36 @@ function correct(folder) {
 function wrong() {
 
     if (isMoving) {
-
         return;
-
     }
-
-
-    isMoving = true;
-
 
     const card =
-        document.querySelector(".currentAsset");
-
-
-    if (card) {
-
-        card.classList.add("shake");
-
-    }
-
+        document.querySelector(
+            ".assetCard.shake"
+        );
 
     showMessage(
         "✖ Wrong",
         "#FF4444"
     );
 
-
     lives--;
-
 
     livesDisplay.innerHTML =
         "❤️".repeat(lives);
 
-
     if (lives <= 0) {
 
-        setTimeout(() => {
-
-            finishGame();
-
-        }, 500);
+        finishGame();
 
         return;
-
     }
-
-
-    setTimeout(() => {
-
-        moveBelt();
-
-    }, 400);
 
 }
 
 // =====================================================
 // MOVE FILM STRIP
 // =====================================================
-
-function moveBelt() {
-
-    const firstCard =
-        belt.querySelector(".assetCard");
-
-
-    if (!firstCard) {
-
-        finishGame();
-
-        return;
-
-    }
-
-
-    const cardWidth =
-        firstCard.offsetWidth;
-
-
-    const beltStyle =
-        window.getComputedStyle(belt);
-
-
-    const gap =
-        parseFloat(beltStyle.gap) || 0;
-
-
-    const moveDistance =
-        cardWidth + gap;
-
-
-    // Turn animation on
-
-    belt.style.transition =
-        "transform 0.45s ease";
-
-
-    // Move entire train left
-
-    const movingConveyor =
-    document.getElementById("movingConveyor");
-
-    movingConveyor.style.transform =
-    `translateX(-${moveDistance}px)`;
-
-
-    setTimeout(() => {
-
-        currentCard++;
-
-
-        // Finished all cards
-
-        if (currentCard >= assets.length) {
-
-            finishGame();
-
-            return;
-
-        }
-
-
-        // Rebuild belt
-
-        drawBelt();
-
-
-        isMoving = false;
-
-    }, 450);
-
-}
 
 // =====================================================
 // MESSAGE

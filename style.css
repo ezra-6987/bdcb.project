@@ -412,7 +412,7 @@ animation:shake .4s;
 
     transition:transform .45s ease;
 
-    animation:conveyorMove 2s linear infinite;
+    animation:conveyorMove 4s linear infinite;
 
 }
 
