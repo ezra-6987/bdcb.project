@@ -26,33 +26,81 @@ const folders = document.querySelectorAll(".folder");
 const assets = [
 
     {
+        name: "Aircraft",
+        image: "images/Aircraft.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Art",
+        image: "images/Art.png",
+        category: "Collateralised"
+    },
+
+    {
         name: "Crops",
-        image: "images/crops.jpg",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Jewellery",
-        image: "images/jewellery.jpg",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Motor Vehicle",
-        image: "images/vehicle.jpg",
+        image: "images/Crops.png",
         category: "Collateralised"
     },
 
     {
         name: "Life Insurance",
-        image: "images/insurance.jpg",
+        image: "images/Insurance.png",
         category: "Non-Collateralised"
     },
 
     {
-        name: "Fixed Deposit",
-        image: "images/deposit.jpg",
-        category: "Non-Collateralised"
+        name: "Inventory",
+        image: "images/Inventory.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Jewelry",
+        image: "images/Jewelry.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Land",
+        image: "images/Land.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Livestocks",
+        image: "images/Livestocks.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Machines",
+        image: "images/Machines.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Money",
+        image: "images/Money.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Property",
+        image: "images/Property.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Rentals",
+        image: "images/Rentals.png",
+        category: "Collateralised"
+    },
+
+    {
+        name: "Ships",
+        image: "images/Ships.png",
+        category: "Collateralised"
     }
 
 ];

@@ -86,41 +86,41 @@ button{
 
 }
 
-.folder{
+.folder {
 
-    width:250px;
+    width: 250px;
 
-    height:150px;
+    height: 150px;
 
-    background:#d7b17c;
+    background: #d7b17c;
 
-    border-radius:15px;
+    border-radius: 15px;
 
-    color:#222;
+    color: #222;
 
-    font-size:28px;
+    font-size: 28px;
 
-    font-weight:bold;
+    font-weight: bold;
 
-    display:flex;
+    display: flex;
 
-    flex-direction:column;
+    flex-direction: column;
 
-    justify-content:center;
+    justify-content: center;
 
-    align-items:center;
+    align-items: center;
 
-    cursor:pointer;
+    cursor: pointer;
+
+    transition: 0.3s;
 
 }
 
-.folder:hover{
+.folder:hover {
 
-    background:#e8c897;
+    background: #e8c897;
 
-    transform:scale(1.05);
-
-    transition:0.3s;
+    transform: scale(1.05);
 
 }
 
@@ -391,7 +391,7 @@ animation:shake .4s;
 
     width:900px;
 
-    height:220px;
+    height:235px;
 
     margin:auto;
 
@@ -406,9 +406,9 @@ animation:shake .4s;
     left:0;
     top:0;
 
-    width: 100%;
+    width: 1920px;
 
-    height:220px;
+    height: 235px;
 
     transition:transform .45s ease;
 
@@ -416,21 +416,23 @@ animation:shake .4s;
 
 }
 
-#conveyorImage{
+#conveyorImage {
 
-    position:absolute;
+    position: absolute;
 
-    width:100%;
+    width: 1920px;
 
-    height:100%;
+    height: 235px;
 
-    left:0;
+    left: 0;
 
-    top:0;
+    top: 0;
 
-    object-fit:fill;
+    max-width: none;
 
-    pointer-events:none;
+    object-fit: none;
+
+    pointer-events: none;
 
 }
 
@@ -442,8 +444,9 @@ animation:shake .4s;
 
     top:0;
 
-    width:900px;
-    height:220px;
+    width:1920px;
+
+    height:235px;
 
     z-index:2;
 
@@ -451,9 +454,9 @@ animation:shake .4s;
 
 .assetCard{
 
-    width:100px;
+    width: 122px;
 
-    height:135px;
+    height:107px;
 
     margin: 0;
 
@@ -471,9 +474,9 @@ animation:shake .4s;
 
 .assetCard img{
 
-    width:100%;
+    width: 122px;;
 
-    height:95px;
+    height: 107px;;
 
     object-fit:cover;
 
@@ -511,8 +514,9 @@ animation:shake .4s;
 
     position:absolute;
 
-    width:110px;
-    height:150px;
+    width: 122px;
+
+    height: 107px;
 
     display:flex;
 
@@ -520,40 +524,90 @@ animation:shake .4s;
 
     align-items:center;
 
-    border:2px dashed red;
-
-}
-#slot1{
-
-    left:18px;
-    top:25px;
+   z-index:10;
 
 }
 
-#slot2{
+#slot1 {
+    left: 35px;
+    top: 35px;
+}
 
-    left:192px;
-    top:25px;
+#slot2 {
+    left: 185px;
+    top: 35px;
+}
+
+#slot3 {
+    left: 335px;
+    top: 35px;
+}
+
+#slot4 {
+    left: 485px;
+    top: 35px;
+}
+
+#slot5 {
+    left: 635px;
+    top: 35px;
+}
+
+#slot6 {
+    left: 785px;
+    top: 35px;
+}
+
+#slot7 {
+    left: 935px;
+    top: 35px;
+}
+
+#slot8 {
+    left: 1085px;
+    top: 35px;
+}
+
+#slot9 {
+    left: 1235px;
+    top: 35px;
+}
+
+#slot10 {
+    left: 1385px;
+    top: 35px;
+}
+
+#slot11 {
+    left: 1535px;
+    top: 35px;
+}
+
+#slot12 {
+    left: 1685px;
+    top: 35px;
+}
+
+#slot13 {
+    left: 1835px;
+    top: 35px;
+}
+
+/* ========================================= */
+/* FOLDER IMAGE */
+/* ========================================= */
+
+.folderImage {
+
+    width: 90px;
+
+    height: 90px;
+
+    object-fit: contain;
+
+    display: block;
+
+    margin-bottom: 10px;
 
 }
 
-#slot3{
-
-    left:366px;
-    top:25px;
-
-}
-
-#slot4{
-
-    left:540px;
-    top:25px;
-
-}
-
-#slot5{
-
-    left:714px;
-    top:25px;
-
-}
