@@ -1,137 +1,134 @@
+/* =====================================================
+   GLOBAL
+   ===================================================== */
+
 body {
     margin: 0;
-
     font-family: Arial, sans-serif;
 
     color: rgb(5, 153, 12);
-
     text-align: center;
 
     background-image: url("images/background.png");
-
     background-size: cover;
-
     background-position: center;
-
     background-repeat: no-repeat;
-
     background-attachment: fixed;
 
     min-height: 100vh;
 }
 
-#startScreen{
 
-    margin-top:100px;
+/* =====================================================
+   START SCREEN
+   ===================================================== */
 
+#startScreen {
+    margin-top: 100px;
 }
 
-h1{
-
-    font-size:60px;
-
+h1 {
+    font-size: 60px;
 }
 
-h3{
-
-    font-size:30px;
-
-    color:#f81111;
-
+h3 {
+    font-size: 30px;
+    color: #f81111;
 }
 
-button{
+button {
+    width: 180px;
+    height: 70px;
 
-    width:180px;
-
-    height:70px;
-
-    font-size:30px;
-
-    cursor:pointer;
-
+    font-size: 30px;
+    cursor: pointer;
 }
 
-#gameScreen{
 
-    display:none;
+/* =====================================================
+   GAME SCREEN
+   ===================================================== */
 
+#gameScreen {
+    display: none;
 }
 
-#topBar{
 
-    display:flex;
+/* =====================================================
+   TOP BAR
+   ===================================================== */
 
-    justify-content:space-between;
-
-    align-items:center;
-
-    padding:20px;
-
-    font-size:28px;
-
-}
-
-#cardArea{
-
-    width:250px;
-
-    height:280px;
-
-    margin:50px auto;
-
-}
-
-#dropArea{
-
-    display:flex;
-
-    justify-content:center;
-
-    gap:80px;
-
-    margin-top:40px;
-
-}
-
-.folder {
-    width: 250px;
-    height: 150px;
-
-    background: transparent;
-
-    border-radius: 0;
-
-    color: #222;
-
-    font-size: 0;
-
-    font-weight: normal;
-
+#topBar {
     display: flex;
-
-    flex-direction: column;
-
-    justify-content: center;
-
+    justify-content: space-between;
     align-items: center;
 
-    cursor: pointer;
+    padding: 20px;
 
+    font-size: 28px;
+}
+
+
+/* =====================================================
+   CARD AREA
+   ===================================================== */
+
+#cardArea {
+    width: 250px;
+    height: 280px;
+
+    margin: 50px auto;
+}
+
+
+/* =====================================================
+   DROP AREA
+   ===================================================== */
+
+#dropArea {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    gap: 80px;
+
+    margin-top: 40px;
+}
+
+
+/* =====================================================
+   FOLDERS
+   ===================================================== */
+
+.folder {
+    position: relative;
+
+    width: 300px;
+    height: 180px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    background: transparent;
     border: none;
-
     box-shadow: none;
+
+    cursor: pointer;
 
     transition: transform 0.2s ease;
 }
 
 .folder:hover {
-    background: transparent;
-
     transform: scale(1.05);
 }
 
-.folder img {
+
+/* Folder image */
+
+#collateral,
+#nonCollateral,
+.folderImage {
     width: 100%;
     height: 100%;
 
@@ -142,298 +139,278 @@ button{
     pointer-events: none;
 }
 
+
+/* Hide original folder text */
+
 .folder span {
     display: none;
 }
 
-.card{
 
-    width:220px;
+/* =====================================================
+   OLD CARD STYLES
+   ===================================================== */
 
-    background:white;
+.card {
+    width: 220px;
 
-    color:black;
+    background: white;
+    color: black;
 
-    border-radius:15px;
+    border-radius: 15px;
+    padding: 10px;
 
-    padding:10px;
+    margin: auto;
 
-    margin:auto;
+    box-shadow:
+        0 5px 15px rgba(0, 0, 0, 0.4);
 
-    box-shadow:0px 5px 15px rgba(0,0,0,0.4);
-
+    cursor: grab;
 }
 
-.card img{
-
-    width:9%;
-
-    border-radius:10px;
-
+.card img {
+    width: 9%;
+    border-radius: 10px;
 }
 
-.card h2{
-
-    text-align:center;
-
+.card h2 {
+    text-align: center;
 }
 
-.card{
-
-    cursor:grab;
-
+.card:active {
+    cursor: grabbing;
+    transform: scale(1.05);
 }
 
-.card:active{
 
-    cursor:grabbing;
+/* =====================================================
+   SLIDE ANIMATIONS
+   ===================================================== */
 
-    transform:scale(1.05);
+@keyframes slideOut {
 
-}
-
-@keyframes slideOut{
-
-    from{
-
-        opacity:1;
-        transform:translateX(0);
-
+    from {
+        opacity: 1;
+        transform: translateX(0);
     }
 
-    to{
-
-        opacity:0;
-        transform:translateX(-300px);
-
+    to {
+        opacity: 0;
+        transform: translateX(-300px);
     }
 
 }
 
-@keyframes slideIn{
+@keyframes slideIn {
 
-    from{
-
-        opacity:0;
-        transform:translateX(300px);
-
+    from {
+        opacity: 0;
+        transform: translateX(300px);
     }
 
-    to{
-
-        opacity:1;
-        transform:translateX(0);
-
+    to {
+        opacity: 1;
+        transform: translateX(0);
     }
 
 }
 
-.slideOut{
-
-    animation:slideOut .35s forwards;
-
+.slideOut {
+    animation: slideOut 0.35s forwards;
 }
 
-.slideIn{
-
-    animation:slideIn .35s;
-
+.slideIn {
+    animation: slideIn 0.35s;
 }
 
-@keyframes bounce{
 
-    0%{
+/* =====================================================
+   BOUNCE
+   ===================================================== */
 
-        transform:scale(1);
+@keyframes bounce {
 
+    0% {
+        transform: scale(1);
     }
 
-    50%{
-
-        transform:scale(1.15);
-
+    50% {
+        transform: scale(1.15);
     }
 
-    100%{
-
-        transform:scale(1);
-
+    100% {
+        transform: scale(1);
     }
 
 }
 
-.bounce{
-
-    animation:bounce .4s;
-
+.bounce {
+    animation: bounce 0.4s;
 }
 
-#message{
 
-    position:absolute;
+/* =====================================================
+   CORRECT / WRONG MESSAGE
+   ===================================================== */
 
-    top:130px;
+#message {
+    position: absolute;
 
-    width:100%;
+    top: 130px;
+    width: 100%;
 
-    text-align:center;
+    text-align: center;
 
-    font-size:50px;
+    font-size: 50px;
+    font-weight: bold;
 
-    font-weight:bold;
+    color: white;
 
-    color:white;
+    pointer-events: none;
 
-    pointer-events:none;
-
-    opacity:0;
-
+    opacity: 0;
 }
 
-@keyframes popup{
+@keyframes popup {
 
-    0%{
-
-        opacity:0;
-        transform:translateY(40px);
-
+    0% {
+        opacity: 0;
+        transform: translateY(40px);
     }
 
-    20%{
-
-        opacity:1;
-
+    20% {
+        opacity: 1;
     }
 
-    100%{
-
-        opacity:0;
-        transform:translateY(-50px);
-
+    100% {
+        opacity: 0;
+        transform: translateY(-50px);
     }
 
 }
 
-.popup{
-
-    animation:popup .8s;
-
+.popup {
+    animation: popup 0.8s;
 }
 
-.piece{
 
-    position:absolute;
+/* =====================================================
+   CONFETTI
+   ===================================================== */
 
-    width:10px;
+.piece {
+    position: absolute;
 
-    height:10px;
+    width: 10px;
+    height: 10px;
 
-    top:-20px;
+    top: -20px;
 
-    animation:fall 3s linear;
-
+    animation: fall 3s linear;
 }
 
-@keyframes fall{
+@keyframes fall {
 
-    to{
-
-        transform:translateY(110vh)
-                  rotate(720deg);
-
+    to {
+        transform:
+            translateY(110vh)
+            rotate(720deg);
     }
 
 }
 
-@keyframes shake{
 
-0%{
+/* =====================================================
+   SHAKE
+   ===================================================== */
 
-transform:translateX(0);
+@keyframes shake {
 
-}
+    0% {
+        transform: translateX(0);
+    }
 
-25%{
+    25% {
+        transform: translateX(-15px);
+    }
 
-transform:translateX(-15px);
+    50% {
+        transform: translateX(15px);
+    }
 
-}
+    75% {
+        transform: translateX(-15px);
+    }
 
-50%{
-
-transform:translateX(15px);
-
-}
-
-75%{
-
-transform:translateX(-15px);
-
-}
-
-100%{
-
-transform:translateX(0);
+    100% {
+        transform: translateX(0);
+    }
 
 }
 
+.shake {
+    animation: shake 0.4s;
 }
 
-.shake{
 
-animation:shake .4s;
+/* =====================================================
+   GAME OVER
+   ===================================================== */
 
-}
-
-#gameOver{
-
+#gameOver {
     display: none;
 
     text-align: center;
 
     margin-top: 120px;
-
 }
 
+
+/* =====================================================
+   CURRENT ASSET
+   ===================================================== */
+
 .currentAsset {
-
     cursor: grab;
-
 }
 
 .currentAsset:active {
-
     cursor: grabbing;
-
 }
 
-#conveyorArea {
 
+/* =====================================================
+   CONVEYOR AREA
+   ===================================================== */
+
+#conveyorArea {
     position: relative;
 
     width: 900px;
-
     height: 235px;
 
     margin: auto;
 
     overflow: hidden;
-
 }
 
-#movingConveyor {
 
+/* =====================================================
+   CONVEYOR
+   ===================================================== */
+
+#movingConveyor {
     position: absolute;
 
     left: 0;
-
     top: 0;
 
     width: 100%;
-
     height: 100%;
-
 }
+
+
+/* Conveyor background image */
 
 #conveyorImage {
     position: absolute;
@@ -452,6 +429,10 @@ animation:shake .4s;
 }
 
 
+/* =====================================================
+   BELT / SLOTS
+   ===================================================== */
+
 #belt {
     position: absolute;
 
@@ -466,6 +447,11 @@ animation:shake .4s;
     pointer-events: none;
 }
 
+
+/* =====================================================
+   ASSET CARDS
+   ===================================================== */
+
 .assetCard {
     position: absolute;
 
@@ -479,7 +465,7 @@ animation:shake .4s;
     overflow: hidden;
 
     box-shadow:
-        0 3px 8px rgba(0,0,0,0.3);
+        0 3px 8px rgba(0, 0, 0, 0.3);
 
     cursor: grab;
 
@@ -490,6 +476,8 @@ animation:shake .4s;
     z-index: 10;
 }
 
+
+/* Asset image */
 
 .assetCard img {
     width: 100%;
@@ -503,6 +491,8 @@ animation:shake .4s;
 }
 
 
+/* While dragging */
+
 .assetCard:active {
     cursor: grabbing;
 
@@ -510,88 +500,45 @@ animation:shake .4s;
 }
 
 .assetCard.dragging {
-
     cursor: grabbing;
 
-    transform:
-        scale(1.08);
+    transform: scale(1.08);
 
     opacity: 0.85;
 
     z-index: 100;
-
 }
 
-.assetCard.correctCard {
 
+/* Correct card */
+
+.assetCard.correctCard {
     opacity: 0.5;
 
     pointer-events: none;
-
 }
+
+
+/* Wrong card */
 
 .assetCard.shake {
-
-    animation:
-        shake 0.4s;
-
+    animation: shake 0.4s;
 }
 
-/* ========================================= */
-/* FOLDER IMAGE */
-/* ========================================= */
 
-.folderImage {
-
-    width: 80px;
-
-    height: 80px;
-
-    object-fit: contain;
-
-    display: block;
-
-    margin-bottom: 5px;
-
-}
-
-.folder.correctDrop {
-
-    background: #5cb85c;
-
-    transform:
-        scale(1.05);
-
-    box-shadow:
-        0 0 20px
-        rgba(92,255,92,0.8);
-
-}
-
-.folder.wrongDrop {
-
-    background: #d9534f;
-
-    transform:
-        scale(1.05);
-
-    box-shadow:
-        0 0 20px
-        rgba(255,68,68,0.8);
-
-}
+/* =====================================================
+   DROP INDICATOR
+   ===================================================== */
 
 .dropIndicator {
     position: absolute;
 
     bottom: 8px;
-
     left: 50%;
 
     transform: translateX(-50%);
 
     font-size: 16px;
-
     font-weight: bold;
 
     pointer-events: none;
@@ -600,6 +547,11 @@ animation:shake .4s;
 
     transition: 0.15s;
 }
+
+
+/* =====================================================
+   CORRECT FOLDER
+   ===================================================== */
 
 .folder.correctDrop {
     background: #5cb85c;
@@ -612,13 +564,17 @@ animation:shake .4s;
 
 .folder.correctDrop .dropIndicator {
     opacity: 1;
-
     color: white;
 }
 
 .folder.correctDrop .dropIndicator::after {
     content: "✔ CORRECT";
 }
+
+
+/* =====================================================
+   WRONG FOLDER
+   ===================================================== */
 
 .folder.wrongDrop {
     background: #d9534f;
@@ -631,7 +587,6 @@ animation:shake .4s;
 
 .folder.wrongDrop .dropIndicator {
     opacity: 1;
-
     color: white;
 }
 
@@ -639,3 +594,121 @@ animation:shake .4s;
     content: "✖ WRONG";
 }
 
+
+/* =====================================================
+   SORTED ASSETS INSIDE FOLDERS
+   ===================================================== */
+
+.sortedAssets {
+    position: absolute;
+
+    left: 25px;
+    right: 25px;
+    bottom: 15px;
+
+    height: 75px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 3px;
+
+    flex-wrap: wrap;
+
+    overflow: hidden;
+
+    pointer-events: none;
+}
+
+
+/* =====================================================
+   SORTED CARD
+   ===================================================== */
+
+.folder .sortedCard {
+    position: relative;
+
+    width: 70px;
+    height: 85px;
+
+    padding: 3px;
+    margin: 3px;
+
+    background: white;
+
+    border-radius: 6px;
+
+    box-shadow:
+        0 2px 6px rgba(0, 0, 0, 0.3);
+
+    flex-shrink: 0;
+
+    pointer-events: none;
+
+    opacity: 1;
+
+    transform: none;
+}
+
+
+/* Sorted card image */
+
+.folder .sortedCard img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* =====================================================
+   SMALL SORTED CARD
+   ===================================================== */
+
+.sortedCard {
+    width: 45px;
+    height: 55px;
+
+    background: white;
+
+    border-radius: 5px;
+
+    overflow: hidden;
+
+    box-shadow:
+        0 2px 5px rgba(0, 0, 0, 0.3);
+
+    flex-shrink: 0;
+}
+
+.sortedCard img {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
+}
+
+
+/* =====================================================
+   SORTED CARD RESULT
+   ===================================================== */
+
+.sortedCorrect {
+    border: 3px solid #5CFF5C;
+
+    box-shadow:
+        0 0 10px #5CFF5C;
+}
+
+.sortedWrong {
+    border: 3px solid #FF4444;
+
+    box-shadow:
+        0 0 10px #FF4444;
+}

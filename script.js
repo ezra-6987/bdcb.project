@@ -2,22 +2,57 @@
 // ELEMENTS
 // =====================================================
 
-const startButton = document.getElementById("startButton");
-const playAgain = document.getElementById("playAgain");
+const startButton =
+    document.getElementById("startButton");
 
-const startScreen = document.getElementById("startScreen");
-const gameScreen = document.getElementById("gameScreen");
-const gameOver = document.getElementById("gameOver");
+const playAgain =
+    document.getElementById("playAgain");
 
-const belt = document.getElementById("belt");
-const movingConveyor = document.getElementById("movingConveyor");
+const startScreen =
+    document.getElementById("startScreen");
 
-const timerDisplay = document.getElementById("timer");
-const scoreDisplay = document.getElementById("score");
-const livesDisplay = document.getElementById("lives");
-const finalScore = document.getElementById("finalScore");
+const gameScreen =
+    document.getElementById("gameScreen");
 
-const folders = document.querySelectorAll(".folder");
+const gameOver =
+    document.getElementById("gameOver");
+
+const belt =
+    document.getElementById("belt");
+
+const timerDisplay =
+    document.getElementById("timer");
+
+const scoreDisplay =
+    document.getElementById("score");
+
+const livesDisplay =
+    document.getElementById("lives");
+
+const finalScore =
+    document.getElementById("finalScore");
+
+const message =
+    document.getElementById("message");
+
+const folders =
+    document.querySelectorAll(".folder");
+
+const conveyorTrack =
+    document.getElementById("movingConveyor");
+
+const correctSound =
+    document.getElementById("correctSound");
+
+const wrongSound =
+    document.getElementById("wrongSound");
+
+const gameOverSound =
+    document.getElementById("gameOverSound");
+
+const clickSound =
+    document.getElementById("clickSound");
+
 
 // =====================================================
 // ASSETS
@@ -26,80 +61,93 @@ const folders = document.querySelectorAll(".folder");
 const assets = [
 
     {
-        name: "Aircraft",
-        image: "images/Aircraft.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Art",
-        image: "images/Art.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Crops",
-        image: "images/Crops.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Life Insurance",
-        image: "images/Insurance.png",
-        category: "Non-Collateralised"
-    },
-
-    {
-        name: "Inventory",
-        image: "images/Inventory.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Jewelry",
-        image: "images/Jewelry.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Land",
-        image: "images/Land.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Livestocks",
-        image: "images/Livestocks.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Machines",
-        image: "images/Machines.png",
-        category: "Collateralised"
-    },
-
-    {
-        name: "Money",
-        image: "images/Money.png",
-        category: "Collateralised"
-    },
-
-    {
+        id: "property",
         name: "Property",
         image: "images/Property.png",
         category: "Collateralised"
     },
 
     {
+        id: "art",
+        name: "Art",
+        image: "images/Art.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "rentals",
         name: "Rentals",
         image: "images/Rentals.png",
         category: "Collateralised"
     },
 
     {
+        id: "jewelry",
+        name: "Jewelry",
+        image: "images/Jewelry.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "crops",
+        name: "Crops",
+        image: "images/Crops.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "ships",
         name: "Ships",
         image: "images/Ships.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "machines",
+        name: "Machines",
+        image: "images/Machines.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "livestocks",
+        name: "Livestocks",
+        image: "images/Livestocks.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "money",
+        name: "Money",
+        image: "images/Money.png",
+        category: "Non-Collateralised"
+    },
+
+    {
+        id: "lifeInsurance",
+        name: "Life Insurance",
+        image: "images/Insurance.png",
+        category: "Non-Collateralised"
+    },
+
+    {
+        id: "inventory",
+        name: "Inventory",
+        image: "images/Inventory.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "land",
+        name: "Land",
+        image: "images/Land.png",
+        category: "Collateralised"
+    },
+
+    {
+        id: "aircraft",
+        name: "Aircraft",
+        image: "images/Aircraft.png",
         category: "Collateralised"
     }
 
@@ -107,36 +155,10 @@ const assets = [
 
 
 // =====================================================
-// GAME SETTINGS
-// =====================================================
-
-const GAME_TIME = 40;
-
-const STARTING_LIVES = 3;
-
-const CARD_WIDTH = 110;
-
-const CARD_GAP = 64;
-
-const CARD_STEP =
-    CARD_WIDTH + CARD_GAP;
-
-const CARD_SPEED = 45;
-
-const START_POSITIONS = [
-    18,
-    192,
-    366,
-    540,
-    714
-];
-
-
-// =====================================================
 // GAME VARIABLES
 // =====================================================
 
-let remainingAssets = [];
+let activeAssets = [];
 
 let score = 0;
 
@@ -146,52 +168,68 @@ let time = 40;
 
 let timer = null;
 
-let animationFrame = null;
-
 let gameRunning = false;
 
-let conveyorRunning = false;
-
-let lastFrameTime = 0;
-
-let conveyorPosition = 0;
-
-let draggedCard = null;
-
-let draggedAssetName = null;
 
 // =====================================================
-// RANDOMIZE ASSETS
+// CONVEYOR VARIABLES
 // =====================================================
 
-function shuffleAssets(array) {
+let animationFrame = null;
 
-    const shuffled = [...array];
+let lastFrameTime = null;
 
-    for (
-        let i = shuffled.length - 1;
-        i > 0;
-        i--
-    ) {
+let spawnTimer = null;
 
-        const j =
-            Math.floor(
-                Math.random() * (i + 1)
-            );
+let nextAssetIndex = 0;
 
-        [
-            shuffled[i],
-            shuffled[j]
-        ] = [
-            shuffled[j],
-            shuffled[i]
-        ];
+let processedAssets = 0;
 
-    }
 
-    return shuffled;
+// Cards currently visible on conveyor
+//
+// Map:
+// asset ID -> card information
 
-}
+const activeCards =
+    new Map();
+
+
+// =====================================================
+// CONVEYOR SETTINGS
+// =====================================================
+
+// Card movement speed
+
+const CARD_SPEED = 55;
+
+
+// Delay before a replacement card
+// appears after player removes a card
+
+const SPAWN_DELAY = 2000;
+
+
+// Number of cards normally visible
+
+const MAX_VISIBLE_CARDS = 4;
+
+
+// Starting positions for the
+// initial cards
+
+const START_POSITIONS = [
+    80,
+    300,
+    520,
+    740
+];
+
+
+// Position where new cards enter
+
+const CONVEYOR_ENTRY = 920;
+
 
 
 // =====================================================
@@ -206,7 +244,69 @@ startButton.addEventListener(
 
 function startGame() {
 
-    remainingAssets = shuffleAssets(assets);
+    resetGame();
+
+
+    startScreen.style.display =
+        "none";
+
+    gameOver.style.display =
+        "none";
+
+    gameScreen.style.display =
+        "block";
+
+
+    gameRunning = true;
+
+
+    // Restart conveyor artwork
+
+    conveyorTrack.style.animationPlayState =
+        "running";
+
+
+    // Click sound
+
+    playSound(clickSound);
+
+
+    // Timer
+
+    startTimer();
+
+
+    // Start card movement
+
+    startConveyor();
+
+
+    // Put first cards on conveyor
+
+    startInitialCards();
+
+}
+
+
+
+// =====================================================
+// RESET GAME
+// =====================================================
+
+function resetGame() {
+
+    clearInterval(timer);
+
+    clearTimeout(spawnTimer);
+
+    cancelAnimationFrame(
+        animationFrame
+    );
+
+
+    activeAssets =
+        shuffleArray(assets);
+
 
     score = 0;
 
@@ -214,73 +314,286 @@ function startGame() {
 
     time = 40;
 
-    gameRunning = true;
+    nextAssetIndex = 0;
 
-    draggedCard = null;
+    processedAssets = 0;
 
-    draggedAssetName = null;
+    gameRunning = false;
+
+    lastFrameTime = null;
 
 
-    clearInterval(timer);
-
-    cancelAnimationFrame(animationFrame);
-
+    activeCards.clear();
 
     belt.innerHTML = "";
 
 
-    startScreen.style.display = "none";
+    updateDisplays();
 
-    gameOver.style.display = "none";
 
-    gameScreen.style.display = "block";
+    folders.forEach(
+        folder => {
+
+            folder.classList.remove(
+                "correctDrop",
+                "wrongDrop"
+            );
+
+        }
+    );
+
+}
+
+
+
+// =====================================================
+// SHUFFLE ASSETS
+// =====================================================
+
+function shuffleArray(array) {
+
+    const shuffled =
+        [...array];
+
+
+    for (
+        let i = shuffled.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() *
+                (i + 1)
+            );
+
+
+        [
+            shuffled[i],
+            shuffled[j]
+        ] =
+        [
+            shuffled[j],
+            shuffled[i]
+        ];
+
+    }
+
+
+    return shuffled;
+
+}
+
+
+
+// =====================================================
+// UPDATE DISPLAY
+// =====================================================
+
+function updateDisplays() {
+
+    timerDisplay.innerHTML =
+        "⏱ " + time;
 
 
     scoreDisplay.innerHTML =
-        `0 / ${assets.length}`;
-
-
-    document.getElementById("progress").innerHTML =
-        `0 of ${assets.length}`;
+        score +
+        " / " +
+        assets.length;
 
 
     livesDisplay.innerHTML =
         "❤️".repeat(lives);
 
-
-    timerDisplay.innerHTML =
-        `⏱ ${time}`;
+}
 
 
-    createInitialCards();
 
-    startTimer();
+// =====================================================
+// TIMER
+// =====================================================
 
-    startConveyor();
+function startTimer() {
+
+    clearInterval(timer);
+
+
+    timer =
+        setInterval(
+            () => {
+
+                if (!gameRunning) {
+                    return;
+                }
+
+
+                time--;
+
+
+                updateDisplays();
+
+
+                if (time <= 0) {
+
+                    time = 0;
+
+                    updateDisplays();
+
+                    finishGame();
+
+                }
+
+            },
+            1000
+        );
 
 }
 
 
+
 // =====================================================
-// CREATE INITIAL CARDS
+// START CONVEYOR
 // =====================================================
 
-function createInitialCards() {
+function startConveyor() {
 
-    const initialCount =
-        Math.min(
-            5,
-            remainingAssets.length
+    cancelAnimationFrame(
+        animationFrame
+    );
+
+
+    lastFrameTime = null;
+
+
+    animationFrame =
+        requestAnimationFrame(
+            moveCards
         );
 
+}
+
+
+
+// =====================================================
+// MOVE CARDS
+// =====================================================
+
+function moveCards(timestamp) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    if (lastFrameTime === null) {
+
+        lastFrameTime =
+            timestamp;
+
+    }
+
+
+    const deltaTime =
+        (
+            timestamp -
+            lastFrameTime
+        ) / 1000;
+
+
+    lastFrameTime =
+        timestamp;
+
+
+    const cardsToRemove = [];
+
+
+    activeCards.forEach(
+        cardData => {
+
+            cardData.x -=
+                CARD_SPEED *
+                deltaTime;
+
+
+            cardData.element.style.left =
+                cardData.x + "px";
+
+
+            /*
+                Card has travelled completely
+                off the left side.
+            */
+
+            if (
+                cardData.x <
+                -cardData.element.offsetWidth
+            ) {
+
+                cardsToRemove.push(
+                    cardData.id
+                );
+
+            }
+
+        }
+    );
+
+
+    /*
+        Remove cards that have
+        reached the end.
+    */
+
+    cardsToRemove.forEach(
+        cardId => {
+
+            removeCardFromConveyor(
+                cardId
+            );
+
+            /*
+                This card was NOT dragged.
+                It simply reached the end.
+                We still count it as processed
+                so that the game doesn't
+                continue forever.
+            */
+
+            processedAssets++;
+
+            keepConveyorMoving();
+
+        }
+    );
+
+
+    /*
+        Continue animation.
+    */
+
+    animationFrame =
+        requestAnimationFrame(
+            moveCards
+        );
+
+}
+
+
+
+// =====================================================
+// INITIAL CARDS
+// =====================================================
+
+function startInitialCards() {
 
     for (
         let i = 0;
-        i < initialCount;
+        i < START_POSITIONS.length;
         i++
     ) {
 
-        addNextAsset(
+        spawnNextCard(
             START_POSITIONS[i]
         );
 
@@ -289,14 +602,28 @@ function createInitialCards() {
 }
 
 
+
 // =====================================================
-// ADD NEXT ASSET
+// SPAWN NEXT CARD
 // =====================================================
 
-function addNextAsset(position) {
+function spawnNextCard(
+    position = CONVEYOR_ENTRY
+) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    /*
+        All assets have already
+        entered the conveyor.
+    */
 
     if (
-        remainingAssets.length === 0
+        nextAssetIndex >=
+        activeAssets.length
     ) {
 
         return;
@@ -304,10 +631,13 @@ function addNextAsset(position) {
     }
 
 
-    // Take one asset from the queue
-
     const item =
-        remainingAssets.shift();
+        activeAssets[
+            nextAssetIndex
+        ];
+
+
+    nextAssetIndex++;
 
 
     createCard(
@@ -318,18 +648,29 @@ function addNextAsset(position) {
 }
 
 
-function createCard(item, position) {
+
+// =====================================================
+// CREATE CARD
+// =====================================================
+
+function createCard(
+    item,
+    position
+) {
 
     const card =
-        document.createElement("div");
+        document.createElement(
+            "div"
+        );
+
 
     card.className =
         "assetCard";
 
-    card.draggable = true;
 
-    card.dataset.assetName =
-        item.name;
+    card.dataset.id =
+        item.id;
+
 
     card.dataset.category =
         item.category;
@@ -343,38 +684,63 @@ function createCard(item, position) {
     `;
 
 
-    /*
-     * Position the card directly
-     * on the conveyor.
-     */
-
     card.style.left =
         position + "px";
 
+
+    /*
+        Center the card vertically
+        on the conveyor.
+    */
+
     card.style.top =
-        "25px";
+        "50%";
+
+
+    card.style.transform =
+        "translateY(-50%)";
+
+
+    card.draggable =
+        true;
 
 
     card.addEventListener(
         "dragstart",
-        dragStart
+        handleDragStart
     );
+
 
     card.addEventListener(
         "dragend",
-        dragEnd
+        handleDragEnd
     );
 
 
-    belt.appendChild(card);
+    belt.appendChild(
+        card
+    );
+
+
+    activeCards.set(
+        item.id,
+        {
+            id: item.id,
+            item: item,
+            element: card,
+            x: position
+        }
+    );
+
 }
+
 
 
 // =====================================================
 // DRAG START
 // =====================================================
 
-function dragStart(event) {
+function handleDragStart(event) {
 
     if (!gameRunning) {
 
@@ -389,21 +755,13 @@ function dragStart(event) {
         event.currentTarget;
 
 
-    draggedCard = card;
-
-    draggedAssetName =
-        card.dataset.assetName;
+    const cardId =
+        card.dataset.id;
 
 
     event.dataTransfer.setData(
-        "assetName",
-        draggedAssetName
-    );
-
-
-    event.dataTransfer.setData(
-        "category",
-        card.dataset.category
+        "cardId",
+        cardId
     );
 
 
@@ -415,442 +773,223 @@ function dragStart(event) {
         "dragging"
     );
 
-
-    // Clear previous indicators
-
-    clearFolderIndicators();
-
 }
+
 
 
 // =====================================================
 // DRAG END
 // =====================================================
 
-function dragEnd() {
+function handleDragEnd(event) {
 
-    if (draggedCard) {
-
-        draggedCard.classList.remove(
-            "dragging"
-        );
-
-    }
-
-
-    draggedCard = null;
-
-    draggedAssetName = null;
-
-    clearFolderIndicators();
+    event.currentTarget.classList.remove(
+        "dragging"
+    );
 
 }
 
-
-// =====================================================
-// CLEAR FOLDER INDICATORS
-// =====================================================
-
-function clearFolderIndicators() {
-
-    folders.forEach(folder => {
-
-        folder.classList.remove(
-            "correctDrop",
-            "wrongDrop",
-            "active"
-        );
-
-    });
-
-}
 
 
 // =====================================================
 // FOLDER EVENTS
 // =====================================================
 
-folders.forEach(folder => {
+folders.forEach(
+    folder => {
+
+        folder.addEventListener(
+            "dragover",
+            event => {
+
+                if (!gameRunning) {
+                    return;
+                }
 
 
-    // ---------------------------------------------
-    // DRAG OVER
-    // ---------------------------------------------
+                event.preventDefault();
 
-    folder.addEventListener(
-        "dragover",
-        function(event) {
-
-            event.preventDefault();
-
-
-            if (
-                !gameRunning ||
-                !draggedCard
-            ) {
-
-                return;
-
-            }
-
-
-            const isCorrect =
-                draggedCard.dataset.category ===
-                this.dataset.category;
-
-
-            clearFolderIndicators();
-
-
-            if (isCorrect) {
-
-                this.classList.add(
-                    "correctDrop"
-                );
 
                 event.dataTransfer.dropEffect =
                     "move";
 
             }
-
-            else {
-
-                this.classList.add(
-                    "wrongDrop"
-                );
-
-                event.dataTransfer.dropEffect =
-                    "none";
-
-            }
-
-        }
-    );
+        );
 
 
-    // ---------------------------------------------
-    // DRAG ENTER
-    // ---------------------------------------------
+        folder.addEventListener(
+            "dragenter",
+            event => {
 
-    folder.addEventListener(
-        "dragenter",
-        function(event) {
-
-            event.preventDefault();
-
-        }
-    );
+                if (!gameRunning) {
+                    return;
+                }
 
 
-    // ---------------------------------------------
-    // DRAG LEAVE
-    // ---------------------------------------------
-
-    folder.addEventListener(
-        "dragleave",
-        function(event) {
-
-            if (
-                event.relatedTarget &&
-                this.contains(
-                    event.relatedTarget
-                )
-            ) {
-
-                return;
+                event.preventDefault();
 
             }
+        );
 
 
-            this.classList.remove(
-                "correctDrop",
-                "wrongDrop"
-            );
+        folder.addEventListener(
+            "drop",
+            handleDrop
+        );
 
-        }
-    );
+    }
+);
 
-
-    // ---------------------------------------------
-    // DROP
-    // ---------------------------------------------
-
-    folder.addEventListener(
-        "drop",
-        checkAnswer
-    );
-
-});
 
 
 // =====================================================
-// CHECK ANSWER
+// HANDLE DROP
 // =====================================================
 
-function checkAnswer(event) {
+function handleDrop(event) {
 
     event.preventDefault();
 
 
-    if (
-        !gameRunning ||
-        !draggedCard
-    ) {
-
+    if (!gameRunning) {
         return;
-
     }
 
 
-    const card =
-        draggedCard;
+    const cardId =
+        event.dataTransfer.getData(
+            "cardId"
+        );
 
 
-    const assetName =
-        card.dataset.assetName;
+    if (!cardId) {
+        return;
+    }
 
 
-    const answer =
-        card.dataset.category;
+    const cardData =
+        activeCards.get(
+            cardId
+        );
+
+
+    if (!cardData) {
+        return;
+    }
 
 
     const chosenCategory =
         this.dataset.category;
 
 
-    clearFolderIndicators();
+    const correct =
+        cardData.item.category ===
+        chosenCategory;
 
 
-    // ---------------------------------------------
+
+    // =================================================
+    // REMOVE CARD IMMEDIATELY
+    // =================================================
+
+    removeCardFromConveyor(
+        cardId
+    );
+
+
+    /*
+        IMPORTANT:
+
+        Whether the answer is correct
+        OR wrong, the card is gone.
+
+        It is NOT inserted into the folder.
+    */
+
+    processedAssets++;
+
+
+
+    // =================================================
     // CORRECT
-    // ---------------------------------------------
+    // =================================================
 
-    if (
-        answer ===
-        chosenCategory
-    ) {
+    if (correct) {
 
-        correct(
-            assetName,
-            card,
-            this
+        score++;
+
+        updateDisplays();
+
+        showFolderResult(
+            this,
+            true
         );
+
+        showMessage(
+            "✔ CORRECT",
+            "#16a34a"
+        );
+
+        playSound(
+            correctSound
+        );
+
+        confetti();
 
     }
 
 
-    // ---------------------------------------------
+    // =================================================
     // WRONG
-    // ---------------------------------------------
+    // =================================================
 
     else {
 
-        wrong(
-            card,
-            this
+        /*
+            DO NOT increase score.
+        */
+
+        lives--;
+
+        updateDisplays();
+
+        showFolderResult(
+            this,
+            false
+        );
+
+        showMessage(
+            "✖ WRONG",
+            "#dc2626"
+        );
+
+        playSound(
+            wrongSound
         );
 
     }
 
 
-    draggedCard = null;
-
-    draggedAssetName = null;
-
-}
-
-
-// =====================================================
-// CORRECT ANSWER
-// =====================================================
-
-function correct(
-    assetName,
-    card,
-    folder
-) {
-
-    if (!gameRunning) {
-
-        return;
-
-    }
-
-
-    // Visual feedback
-
-    folder.classList.add(
-        "correctDrop",
-        "bounce"
-    );
-
-
-    showMessage(
-        "✔ Correct",
-        "#5CFF5C"
-    );
-
-
-    confetti();
-
-
-    // Score
-
-    score++;
-
-
-    scoreDisplay.innerHTML =
-        `${score} / ${assets.length}`;
-
-    
-    document.getElementById(
-    "progress"
-    ).innerHTML =
-    `${score} of ${assets.length}`;
-
-    // Disable this card
-
-    card.draggable = false;
-
-    card.classList.add(
-        "correctCard"
-    );
-
-
-    // ---------------------------------------------
-    // REMOVE AFTER 2 SECONDS
-    // ---------------------------------------------
-
-    setTimeout(() => {
-
-        if (!gameRunning) {
-
-            return;
-
-        }
-
-
-        removeAsset(
-            assetName,
-            card
-        );
-
-
-        folder.classList.remove(
-            "correctDrop",
-            "bounce"
-        );
-
-
-    }, 2000);
-
-}
-
-
-// =====================================================
-// WRONG ANSWER
-// =====================================================
-
-function wrong(
-    card,
-    folder
-) {
-
-    if (!gameRunning) {
-
-        return;
-
-    }
-
-
-    folder.classList.add(
-        "wrongDrop"
-    );
-
-
-    card.classList.add(
-        "shake"
-    );
-
-
-    showMessage(
-        "✖ Wrong",
-        "#FF4444"
-    );
-
-
-    lives--;
-
-
-    livesDisplay.innerHTML =
-        "❤️".repeat(lives);
-
-
-    setTimeout(() => {
-
-        card.classList.remove(
-            "shake"
-        );
-
-        folder.classList.remove(
-            "wrongDrop"
-        );
-
-    }, 500);
-
-
-    // Game Over
+    // =================================================
+    // NO LIVES
+    // =================================================
 
     if (lives <= 0) {
 
-        setTimeout(() => {
+        finishGame();
 
-            finishGame();
-
-        }, 500);
-
-    }
-
-}
-
-
-// =====================================================
-// REMOVE ASSET
-// =====================================================
-
-function removeAsset(
-    assetName,
-    card
-) {
-
-    if (!gameRunning) {
         return;
-    }
-
-
-    // Remove visual card
-
-    if (card) {
-
-        card.remove();
 
     }
 
 
-    // Increase progress
-
-    document.getElementById(
-        "progress"
-    ).innerHTML =
-        `${score} of ${assets.length}`;
-
-
-    // -----------------------------------------
-    // ALL SORTED
-    // -----------------------------------------
+    // =================================================
+    // ALL ASSETS PROCESSED
+    // =================================================
 
     if (
-        score >= assets.length
+        processedAssets >=
+        assets.length
     ) {
 
         finishGame();
@@ -860,334 +999,217 @@ function removeAsset(
     }
 
 
-    // -----------------------------------------
-    // Bring another asset after 2 seconds
-    // -----------------------------------------
+    // =================================================
+    // BRING NEXT CARD AFTER 2 SECONDS
+    // =================================================
 
-    setTimeout(() => {
-
-        if (!gameRunning) {
-            return;
-        }
-
-
-        addNextAssetFromRight();
-
-    }, 2000);
+    scheduleNextCard();
 
 }
 
 
+
 // =====================================================
-// ADD NEW ASSET FROM RIGHT
+// REMOVE CARD
 // =====================================================
 
-function addNextAssetFromRight() {
+function removeCardFromConveyor(
+    cardId
+) {
 
-    if (
-        remainingAssets.length === 0
-    ) {
-
-        return;
-
-    }
-
-
-    const cards =
-        document.querySelectorAll(
-            ".assetCard"
+    const cardData =
+        activeCards.get(
+            cardId
         );
 
 
-    let rightMost = -Infinity;
-
-
-    cards.forEach(card => {
-
-        const x =
-            parseFloat(
-                card.style.left
-            ) || 0;
-
-
-        if (
-            x > rightMost
-        ) {
-
-            rightMost = x;
-
-        }
-
-    });
-
-    if (rightMost === -Infinity) {
-        rightMost = START_POSITIONS[START_POSITIONS.length - 1];
+    if (!cardData) {
+        return;
     }
 
-    const newPosition =
-        rightMost + CARD_STEP;
 
-
-    addNextAsset(
-        newPosition
+    activeCards.delete(
+        cardId
     );
 
-}
 
-
-// =====================================================
-// CONTINUOUS CONVEYOR
-// =====================================================
-
-function startConveyor() {
-
-    conveyorRunning = true;
-
-    lastFrameTime =
-        performance.now();
-
-
-    function animate(
-        currentTime
-    ) {
-
-        if (
-            !gameRunning ||
-            !conveyorRunning
-        ) {
-
-            return;
-
-        }
-
-
-        const delta =
-            (currentTime -
-                lastFrameTime) /
-            1000;
-
-
-        lastFrameTime =
-            currentTime;
-
-
-        conveyorPosition +=
-            CARD_SPEED *
-            delta;
-
-
-        const cards =
-            document.querySelectorAll(
-                ".assetCard"
-            );
-
-
-        cards.forEach(card => {
-
-            const currentLeft =
-                parseFloat(
-                    card.style.left
-                ) || 0;
-
-
-            card.style.left =
-                (
-                    currentLeft -
-                    CARD_SPEED *
-                    delta
-                ) + "px";
-
-
-            // ----------------------------------
-            // Remove card that has gone offscreen
-            // ----------------------------------
-
-            if (
-                currentLeft <
-                -CARD_WIDTH
-            ) {
-
-                // Only remove if it hasn't
-                // already been sorted
-
-                if (
-                    !card.classList.contains(
-                        "correctCard"
-                    )
-                ) {
-
-                    const assetName =
-                        card.dataset.assetName;
-
-
-                    removeUnsortedCard(
-                        assetName,
-                        card
-                    );
-
-                }
-
-            }
-
-        });
-
-
-        animationFrame =
-            requestAnimationFrame(
-                animate
-            );
-
-    }
-
-
-    animationFrame =
-        requestAnimationFrame(
-            animate
-        );
+    cardData.element.remove();
 
 }
 
 
+
 // =====================================================
-// REMOVE UNSORTED CARD THAT LEFT SCREEN
+// SCHEDULE NEXT CARD
 // =====================================================
 
-function removeUnsortedCard(
-    assetName,
-    card
-) {
+function scheduleNextCard() {
+
+    clearTimeout(
+        spawnTimer
+    );
+
 
     if (!gameRunning) {
         return;
     }
 
 
-    const item =
-        assets.find(
-            asset =>
-                asset.name ===
-                assetName
+    if (
+        nextAssetIndex >=
+        activeAssets.length
+    ) {
+
+        return;
+
+    }
+
+
+    spawnTimer =
+        setTimeout(
+            () => {
+
+                if (!gameRunning) {
+                    return;
+                }
+
+
+                spawnNextCard(
+                    CONVEYOR_ENTRY
+                );
+
+
+            },
+            SPAWN_DELAY
         );
 
+}
 
-    if (!item) {
+
+
+// =====================================================
+// KEEP CONVEYOR POPULATED
+// =====================================================
+
+function keepConveyorMoving() {
+
+    if (!gameRunning) {
         return;
     }
 
 
-    card.remove();
+    /*
+        Don't add anything if all
+        assets have already entered.
+    */
+
+    if (
+        nextAssetIndex >=
+        activeAssets.length
+    ) {
+
+        return;
+
+    }
 
 
-    // Put the unsorted asset
-    // back at the end of the queue
+    /*
+        Keep at least 4 cards visible.
 
-    remainingAssets.push(item);
+        A slight delay prevents cards
+        from appearing immediately
+        on top of each other.
+    */
 
+    if (
+        activeCards.size <
+        MAX_VISIBLE_CARDS
+    ) {
 
-    // Bring another item in
-    // after a short delay
-
-    setTimeout(() => {
-
-        if (!gameRunning) {
-            return;
-        }
-
-
-        addNextAssetFromRight();
-
-    }, 500);
-
-}
-
-// =====================================================
-// ADD EXISTING ASSET
-// =====================================================
-
-function addCardForExistingAsset(
-    item
-) {
-
-    const cards =
-        document.querySelectorAll(
-            ".assetCard"
+        clearTimeout(
+            spawnTimer
         );
 
 
-    let rightMost = 0;
+        spawnTimer =
+            setTimeout(
+                () => {
+
+                    if (!gameRunning) {
+                        return;
+                    }
 
 
-    cards.forEach(card => {
+                    if (
+                        activeCards.size <
+                        MAX_VISIBLE_CARDS
+                    ) {
 
-        const x =
-            parseFloat(
-                card.style.left
-            ) || 0;
+                        spawnNextCard(
+                            CONVEYOR_ENTRY
+                        );
 
+                    }
 
-        if (
-            x >
-            rightMost
-        ) {
+                },
+                1000
+            );
 
-            rightMost = x;
-
-        }
-
-    });
-
-
-    const card =
-        document.createElement("div");
-
-
-    card.className =
-        "assetCard";
-
-
-    card.draggable = true;
-
-
-    card.dataset.assetName =
-        item.name;
-
-
-    card.dataset.category =
-        item.category;
-
-
-    card.style.left =
-        (
-            rightMost +
-            CARD_STEP
-        ) + "px";
-
-
-    card.innerHTML = `
-
-        <img
-            src="${item.image}"
-            alt="${item.name}"
-        >
-
-    `;
-
-
-    card.addEventListener(
-        "dragstart",
-        dragStart
-    );
-
-
-    card.addEventListener(
-        "dragend",
-        dragEnd
-    );
-
-
-    belt.appendChild(card);
+    }
 
 }
+
+
+
+// =====================================================
+// FOLDER RESULT
+// =====================================================
+
+function showFolderResult(
+    folder,
+    correct
+) {
+
+    folder.classList.remove(
+        "correctDrop",
+        "wrongDrop"
+    );
+
+
+    void folder.offsetWidth;
+
+
+    if (correct) {
+
+        folder.classList.add(
+            "correctDrop"
+        );
+
+    }
+
+    else {
+
+        folder.classList.add(
+            "wrongDrop"
+        );
+
+    }
+
+
+    setTimeout(
+        () => {
+
+            folder.classList.remove(
+                "correctDrop",
+                "wrongDrop"
+            );
+
+        },
+        900
+    );
+
+}
+
 
 
 // =====================================================
@@ -1198,12 +1220,6 @@ function showMessage(
     text,
     color
 ) {
-
-    const message =
-        document.getElementById(
-            "message"
-        );
-
 
     message.innerHTML =
         text;
@@ -1226,15 +1242,44 @@ function showMessage(
     );
 
 
-    setTimeout(() => {
+    setTimeout(
+        () => {
 
-        message.classList.remove(
-            "popup"
-        );
+            message.classList.remove(
+                "popup"
+            );
 
-    }, 800);
+        },
+        800
+    );
 
 }
+
+
+
+// =====================================================
+// SOUND
+// =====================================================
+
+function playSound(
+    sound
+) {
+
+    if (!sound) {
+        return;
+    }
+
+
+    sound.currentTime =
+        0;
+
+
+    sound.play().catch(
+        () => {}
+    );
+
+}
+
 
 
 // =====================================================
@@ -1245,7 +1290,7 @@ function confetti() {
 
     for (
         let i = 0;
-        i < 25;
+        i < 20;
         i++
     ) {
 
@@ -1255,9 +1300,8 @@ function confetti() {
             );
 
 
-        piece.classList.add(
-            "piece"
-        );
+        piece.className =
+            "piece";
 
 
         piece.style.left =
@@ -1285,59 +1329,19 @@ function confetti() {
         );
 
 
-        setTimeout(() => {
+        setTimeout(
+            () => {
 
-            piece.remove();
+                piece.remove();
 
-        }, 3000);
+            },
+            3000
+        );
 
     }
 
 }
 
-
-// =====================================================
-// TIMER
-// =====================================================
-
-function startTimer() {
-
-    clearInterval(timer);
-
-
-    timer =
-        setInterval(() => {
-
-            if (!gameRunning) {
-
-                return;
-
-            }
-
-
-            time--;
-
-
-            timerDisplay.innerHTML =
-                `⏱ ${time}`;
-
-
-            if (time <= 0) {
-
-                time = 0;
-
-
-                timerDisplay.innerHTML =
-                    "⏱ 0";
-
-
-                finishGame();
-
-            }
-
-        }, 1000);
-
-}
 
 
 // =====================================================
@@ -1347,48 +1351,50 @@ function startTimer() {
 function finishGame() {
 
     if (!gameRunning) {
-
         return;
-
     }
 
 
     gameRunning = false;
 
-    conveyorRunning = false;
+
+    // Stop timer
+
+    clearInterval(
+        timer
+    );
 
 
-    clearInterval(timer);
+    // Stop pending spawn
 
+    clearTimeout(
+        spawnTimer
+    );
+
+
+    // Stop card animation
 
     cancelAnimationFrame(
         animationFrame
     );
 
 
-    let bestScore =
-        Number(
-            localStorage.getItem(
-                "bestScore"
-            )
-        ) || 0;
+    animationFrame =
+        null;
 
 
-    if (
-        score >
-        bestScore
-    ) {
+    // Stop conveyor artwork
 
-        bestScore =
-            score;
+    conveyorTrack.style.animationPlayState =
+        "paused";
 
 
-        localStorage.setItem(
-            "bestScore",
-            bestScore
-        );
+    // Final score
 
-    }
+    finalScore.innerHTML = `
+        Your Score:
+        ${score} / ${assets.length}
+    `;
 
 
     gameScreen.style.display =
@@ -1399,15 +1405,12 @@ function finishGame() {
         "block";
 
 
-    finalScore.innerHTML = `
-
-        Your Score : ${score}
-        <br><br>
-        Best Score : ${bestScore}
-
-    `;
+    playSound(
+        gameOverSound
+    );
 
 }
+
 
 
 // =====================================================
@@ -1416,69 +1419,18 @@ function finishGame() {
 
 playAgain.addEventListener(
     "click",
-    restartGame
+    () => {
+
+        gameOver.style.display =
+            "none";
+
+
+        startScreen.style.display =
+            "block";
+
+
+        conveyorTrack.style.animationPlayState =
+            "running";
+
+    }
 );
-
-
-function restartGame() {
-
-    clearInterval(timer);
-
-    cancelAnimationFrame(
-        animationFrame
-    );
-
-
-    gameRunning = false;
-
-    conveyorRunning = false;
-
-    score = 0;
-
-    lives = STARTING_LIVES;
-
-    time = GAME_TIME;
-
-    conveyorPosition = 0;
-
-    draggedCard = null;
-
-    draggedAssetName = null;
-
-
-    belt.innerHTML = "";
-
-
-    movingConveyor.style.transform =
-        "translateX(0px)";
-
-
-    scoreDisplay.innerHTML =
-        `0 / ${assets.length}`;
-
-
-    livesDisplay.innerHTML =
-        "❤️".repeat(
-            STARTING_LIVES
-        );
-
-
-    timerDisplay.innerHTML =
-        `⏱ ${GAME_TIME}`;
-
-
-    clearFolderIndicators();
-
-
-    gameOver.style.display =
-        "none";
-
-
-    gameScreen.style.display =
-        "none";
-
-
-    startScreen.style.display =
-        "block";
-
-}
