@@ -10,6 +10,7 @@ const gameScreen = document.getElementById("gameScreen");
 const gameOver = document.getElementById("gameOver");
 
 const belt = document.getElementById("belt");
+const movingConveyor = document.getElementById("movingConveyor");
 
 const timerDisplay = document.getElementById("timer");
 const scoreDisplay = document.getElementById("score");
@@ -17,7 +18,6 @@ const livesDisplay = document.getElementById("lives");
 const finalScore = document.getElementById("finalScore");
 
 const folders = document.querySelectorAll(".folder");
-
 
 // =====================================================
 // ASSETS
@@ -107,10 +107,36 @@ const assets = [
 
 
 // =====================================================
+// GAME SETTINGS
+// =====================================================
+
+const GAME_TIME = 40;
+
+const STARTING_LIVES = 3;
+
+const CARD_WIDTH = 110;
+
+const CARD_GAP = 64;
+
+const CARD_STEP =
+    CARD_WIDTH + CARD_GAP;
+
+const CARD_SPEED = 45;
+
+const START_POSITIONS = [
+    18,
+    192,
+    366,
+    540,
+    714
+];
+
+
+// =====================================================
 // GAME VARIABLES
 // =====================================================
 
-let activeAssets = [];
+let remainingAssets = [];
 
 let score = 0;
 
@@ -120,29 +146,67 @@ let time = 40;
 
 let timer = null;
 
-let isMoving = false;
+let animationFrame = null;
+
+let gameRunning = false;
+
+let conveyorRunning = false;
+
+let lastFrameTime = 0;
+
+let conveyorPosition = 0;
+
+let draggedCard = null;
+
+let draggedAssetName = null;
+
+// =====================================================
+// RANDOMIZE ASSETS
+// =====================================================
+
+function shuffleAssets(array) {
+
+    const shuffled = [...array];
+
+    for (
+        let i = shuffled.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const j =
+            Math.floor(
+                Math.random() * (i + 1)
+            );
+
+        [
+            shuffled[i],
+            shuffled[j]
+        ] = [
+            shuffled[j],
+            shuffled[i]
+        ];
+
+    }
+
+    return shuffled;
+
+}
 
 
 // =====================================================
 // START GAME
 // =====================================================
 
-startButton.addEventListener("click", startGame);
-
-function shuffleAssets(array) {
-
-    return [...array].sort(
-        () => Math.random() - 0.5
-    );
-
-}
+startButton.addEventListener(
+    "click",
+    startGame
+);
 
 
 function startGame() {
 
-    console.log("Start clicked");
-
-    activeAssets = shuffleAssets(assets);
+    remainingAssets = shuffleAssets(assets);
 
     score = 0;
 
@@ -150,104 +214,160 @@ function startGame() {
 
     time = 40;
 
-    isMoving = false;
+    gameRunning = true;
+
+    draggedCard = null;
+
+    draggedAssetName = null;
 
 
-    // Hide screens
+    clearInterval(timer);
+
+    cancelAnimationFrame(animationFrame);
+
+
+    belt.innerHTML = "";
+
 
     startScreen.style.display = "none";
 
     gameOver.style.display = "none";
 
-
-    // Show game
-
     gameScreen.style.display = "block";
 
 
-    // Reset displays
-
     scoreDisplay.innerHTML =
-        score + " / " + assets.length;
+        `0 / ${assets.length}`;
+
+
+    document.getElementById("progress").innerHTML =
+        `0 of ${assets.length}`;
+
 
     livesDisplay.innerHTML =
         "❤️".repeat(lives);
 
+
     timerDisplay.innerHTML =
-        "⏱ " + time;
+        `⏱ ${time}`;
 
 
-    // Draw cards
-
-    drawBelt();
-
-    belt.style.transition = "none";
-    
-    belt.style.transform = "translateX(0)";
-
-    // Start countdown
+    createInitialCards();
 
     startTimer();
+
+    startConveyor();
 
 }
 
 
 // =====================================================
-// DRAW FILM STRIP
+// CREATE INITIAL CARDS
 // =====================================================
 
-function drawBelt() {
+function createInitialCards() {
 
-    const slots =
-        document.querySelectorAll(".slot");
-
-    // Clear the five slots
-    slots.forEach(slot => {
-        slot.innerHTML = "";
-    });
-
-    // Put active assets into the slots
-    for (let i = 0; i < slots.length; i++) {
-
-        const item = activeAssets[i];
-
-        if (!item) {
-            continue;
-        }
-
-        const card =
-            document.createElement("div");
-
-        card.className = "assetCard";
-
-        card.draggable = true;
-
-        card.dataset.index = i;
-
-        card.dataset.category =
-            item.category;
-
-        card.innerHTML = `
-            <img
-                src="${item.image}"
-                alt="${item.name}"
-            >
-
-            <div class="cardTitle">
-                ${item.name}
-            </div>
-        `;
-
-        card.addEventListener(
-            "dragstart",
-            dragStart
+    const initialCount =
+        Math.min(
+            5,
+            remainingAssets.length
         );
 
-        slots[i].appendChild(card);
+
+    for (
+        let i = 0;
+        i < initialCount;
+        i++
+    ) {
+
+        addNextAsset(
+            START_POSITIONS[i]
+        );
+
     }
 
 }
 
+
+// =====================================================
+// ADD NEXT ASSET
+// =====================================================
+
+function addNextAsset(position) {
+
+    if (
+        remainingAssets.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    // Take one asset from the queue
+
+    const item =
+        remainingAssets.shift();
+
+
+    createCard(
+        item,
+        position
+    );
+
+}
+
+
+function createCard(item, position) {
+
+    const card =
+        document.createElement("div");
+
+    card.className =
+        "assetCard";
+
+    card.draggable = true;
+
+    card.dataset.assetName =
+        item.name;
+
+    card.dataset.category =
+        item.category;
+
+
+    card.innerHTML = `
+        <img
+            src="${item.image}"
+            alt="${item.name}"
+        >
+    `;
+
+
+    /*
+     * Position the card directly
+     * on the conveyor.
+     */
+
+    card.style.left =
+        position + "px";
+
+    card.style.top =
+        "25px";
+
+
+    card.addEventListener(
+        "dragstart",
+        dragStart
+    );
+
+    card.addEventListener(
+        "dragend",
+        dragEnd
+    );
+
+
+    belt.appendChild(card);
+}
 
 
 // =====================================================
@@ -256,36 +376,95 @@ function drawBelt() {
 
 function dragStart(event) {
 
-    if (isMoving) {
+    if (!gameRunning) {
 
         event.preventDefault();
 
         return;
+
     }
+
 
     const card =
         event.currentTarget;
 
-    const category =
-        card.dataset.category;
 
-    const index =
-        card.dataset.index;
+    draggedCard = card;
+
+    draggedAssetName =
+        card.dataset.assetName;
+
+
+    event.dataTransfer.setData(
+        "assetName",
+        draggedAssetName
+    );
+
 
     event.dataTransfer.setData(
         "category",
-        category
+        card.dataset.category
     );
 
-    event.dataTransfer.setData(
-        "index",
-        index
-    );
 
     event.dataTransfer.effectAllowed =
         "move";
 
+
+    card.classList.add(
+        "dragging"
+    );
+
+
+    // Clear previous indicators
+
+    clearFolderIndicators();
+
 }
+
+
+// =====================================================
+// DRAG END
+// =====================================================
+
+function dragEnd() {
+
+    if (draggedCard) {
+
+        draggedCard.classList.remove(
+            "dragging"
+        );
+
+    }
+
+
+    draggedCard = null;
+
+    draggedAssetName = null;
+
+    clearFolderIndicators();
+
+}
+
+
+// =====================================================
+// CLEAR FOLDER INDICATORS
+// =====================================================
+
+function clearFolderIndicators() {
+
+    folders.forEach(folder => {
+
+        folder.classList.remove(
+            "correctDrop",
+            "wrongDrop",
+            "active"
+        );
+
+    });
+
+}
+
 
 // =====================================================
 // FOLDER EVENTS
@@ -293,17 +472,65 @@ function dragStart(event) {
 
 folders.forEach(folder => {
 
+
+    // ---------------------------------------------
+    // DRAG OVER
+    // ---------------------------------------------
+
     folder.addEventListener(
         "dragover",
         function(event) {
 
             event.preventDefault();
 
-            event.dataTransfer.dropEffect = "move";
+
+            if (
+                !gameRunning ||
+                !draggedCard
+            ) {
+
+                return;
+
+            }
+
+
+            const isCorrect =
+                draggedCard.dataset.category ===
+                this.dataset.category;
+
+
+            clearFolderIndicators();
+
+
+            if (isCorrect) {
+
+                this.classList.add(
+                    "correctDrop"
+                );
+
+                event.dataTransfer.dropEffect =
+                    "move";
+
+            }
+
+            else {
+
+                this.classList.add(
+                    "wrongDrop"
+                );
+
+                event.dataTransfer.dropEffect =
+                    "none";
+
+            }
 
         }
     );
 
+
+    // ---------------------------------------------
+    // DRAG ENTER
+    // ---------------------------------------------
 
     folder.addEventListener(
         "dragenter",
@@ -311,21 +538,42 @@ folders.forEach(folder => {
 
             event.preventDefault();
 
-            this.classList.add("active");
-
         }
     );
 
+
+    // ---------------------------------------------
+    // DRAG LEAVE
+    // ---------------------------------------------
 
     folder.addEventListener(
         "dragleave",
-        function() {
+        function(event) {
 
-            this.classList.remove("active");
+            if (
+                event.relatedTarget &&
+                this.contains(
+                    event.relatedTarget
+                )
+            ) {
+
+                return;
+
+            }
+
+
+            this.classList.remove(
+                "correctDrop",
+                "wrongDrop"
+            );
 
         }
     );
 
+
+    // ---------------------------------------------
+    // DROP
+    // ---------------------------------------------
 
     folder.addEventListener(
         "drop",
@@ -333,6 +581,7 @@ folders.forEach(folder => {
     );
 
 });
+
 
 // =====================================================
 // CHECK ANSWER
@@ -342,179 +591,651 @@ function checkAnswer(event) {
 
     event.preventDefault();
 
-    if (isMoving) {
+
+    if (
+        !gameRunning ||
+        !draggedCard
+    ) {
+
         return;
+
     }
 
-    this.classList.remove("active");
+
+    const card =
+        draggedCard;
+
+
+    const assetName =
+        card.dataset.assetName;
+
 
     const answer =
-        event.dataTransfer.getData(
-            "category"
-        );
+        card.dataset.category;
 
-    const assetIndex =
-        Number(
-            event.dataTransfer.getData(
-                "index"
-            )
-        );
 
     const chosenCategory =
         this.dataset.category;
 
-    if (answer === chosenCategory) {
+
+    clearFolderIndicators();
+
+
+    // ---------------------------------------------
+    // CORRECT
+    // ---------------------------------------------
+
+    if (
+        answer ===
+        chosenCategory
+    ) {
 
         correct(
-            assetIndex,
+            assetName,
+            card,
             this
         );
 
-
     }
+
+
+    // ---------------------------------------------
+    // WRONG
+    // ---------------------------------------------
+
     else {
 
-        wrong();
+        wrong(
+            card,
+            this
+        );
 
     }
 
-}
 
-function removeAsset(index) {
+    draggedCard = null;
 
-    activeAssets.splice(index, 1);
-
-    // All assets have been sorted
-    if (activeAssets.length === 0) {
-
-        clearInterval(timer);
-
-        isMoving = true;
-
-        finishGame();
-
-        return;
-
-    }
-
-    // There are still assets remaining
-    drawBelt();
-
-    isMoving = false;
+    draggedAssetName = null;
 
 }
+
 
 // =====================================================
 // CORRECT ANSWER
 // =====================================================
 
-function correct(assetIndex, folder) {
+function correct(
+    assetName,
+    card,
+    folder
+) {
 
-    if (isMoving) {
+    if (!gameRunning) {
+
         return;
+
     }
 
-    isMoving = true;
 
-    folder.classList.add("bounce");
+    // Visual feedback
+
+    folder.classList.add(
+        "correctDrop",
+        "bounce"
+    );
+
 
     showMessage(
         "✔ Correct",
         "#5CFF5C"
     );
 
+
     confetti();
+
+
+    // Score
 
     score++;
 
+
     scoreDisplay.innerHTML =
-        score + " / " + assets.length;
+        `${score} / ${assets.length}`;
+
+    
+    document.getElementById(
+    "progress"
+    ).innerHTML =
+    `${score} of ${assets.length}`;
+
+    // Disable this card
+
+    card.draggable = false;
+
+    card.classList.add(
+        "correctCard"
+    );
+
+
+    // ---------------------------------------------
+    // REMOVE AFTER 2 SECONDS
+    // ---------------------------------------------
 
     setTimeout(() => {
 
+        if (!gameRunning) {
+
+            return;
+
+        }
+
+
+        removeAsset(
+            assetName,
+            card
+        );
+
+
         folder.classList.remove(
+            "correctDrop",
             "bounce"
         );
 
-    }, 400);
 
-    setTimeout(() => {
-
-        removeAsset(assetIndex);
-
-    }, 450);
+    }, 2000);
 
 }
+
 
 // =====================================================
 // WRONG ANSWER
 // =====================================================
 
-function wrong() {
+function wrong(
+    card,
+    folder
+) {
 
-    if (isMoving) {
+    if (!gameRunning) {
+
         return;
+
     }
 
-    const card =
-        document.querySelector(
-            ".assetCard.shake"
-        );
+
+    folder.classList.add(
+        "wrongDrop"
+    );
+
+
+    card.classList.add(
+        "shake"
+    );
+
 
     showMessage(
         "✖ Wrong",
         "#FF4444"
     );
 
+
     lives--;
+
 
     livesDisplay.innerHTML =
         "❤️".repeat(lives);
 
+
+    setTimeout(() => {
+
+        card.classList.remove(
+            "shake"
+        );
+
+        folder.classList.remove(
+            "wrongDrop"
+        );
+
+    }, 500);
+
+
+    // Game Over
+
     if (lives <= 0) {
 
-        finishGame();
+        setTimeout(() => {
 
-        return;
+            finishGame();
+
+        }, 500);
+
     }
 
 }
 
+
 // =====================================================
-// MOVE FILM STRIP
+// REMOVE ASSET
 // =====================================================
+
+function removeAsset(
+    assetName,
+    card
+) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    // Remove visual card
+
+    if (card) {
+
+        card.remove();
+
+    }
+
+
+    // Increase progress
+
+    document.getElementById(
+        "progress"
+    ).innerHTML =
+        `${score} of ${assets.length}`;
+
+
+    // -----------------------------------------
+    // ALL SORTED
+    // -----------------------------------------
+
+    if (
+        score >= assets.length
+    ) {
+
+        finishGame();
+
+        return;
+
+    }
+
+
+    // -----------------------------------------
+    // Bring another asset after 2 seconds
+    // -----------------------------------------
+
+    setTimeout(() => {
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        addNextAssetFromRight();
+
+    }, 2000);
+
+}
+
+
+// =====================================================
+// ADD NEW ASSET FROM RIGHT
+// =====================================================
+
+function addNextAssetFromRight() {
+
+    if (
+        remainingAssets.length === 0
+    ) {
+
+        return;
+
+    }
+
+
+    const cards =
+        document.querySelectorAll(
+            ".assetCard"
+        );
+
+
+    let rightMost = -Infinity;
+
+
+    cards.forEach(card => {
+
+        const x =
+            parseFloat(
+                card.style.left
+            ) || 0;
+
+
+        if (
+            x > rightMost
+        ) {
+
+            rightMost = x;
+
+        }
+
+    });
+
+    if (rightMost === -Infinity) {
+        rightMost = START_POSITIONS[START_POSITIONS.length - 1];
+    }
+
+    const newPosition =
+        rightMost + CARD_STEP;
+
+
+    addNextAsset(
+        newPosition
+    );
+
+}
+
+
+// =====================================================
+// CONTINUOUS CONVEYOR
+// =====================================================
+
+function startConveyor() {
+
+    conveyorRunning = true;
+
+    lastFrameTime =
+        performance.now();
+
+
+    function animate(
+        currentTime
+    ) {
+
+        if (
+            !gameRunning ||
+            !conveyorRunning
+        ) {
+
+            return;
+
+        }
+
+
+        const delta =
+            (currentTime -
+                lastFrameTime) /
+            1000;
+
+
+        lastFrameTime =
+            currentTime;
+
+
+        conveyorPosition +=
+            CARD_SPEED *
+            delta;
+
+
+        const cards =
+            document.querySelectorAll(
+                ".assetCard"
+            );
+
+
+        cards.forEach(card => {
+
+            const currentLeft =
+                parseFloat(
+                    card.style.left
+                ) || 0;
+
+
+            card.style.left =
+                (
+                    currentLeft -
+                    CARD_SPEED *
+                    delta
+                ) + "px";
+
+
+            // ----------------------------------
+            // Remove card that has gone offscreen
+            // ----------------------------------
+
+            if (
+                currentLeft <
+                -CARD_WIDTH
+            ) {
+
+                // Only remove if it hasn't
+                // already been sorted
+
+                if (
+                    !card.classList.contains(
+                        "correctCard"
+                    )
+                ) {
+
+                    const assetName =
+                        card.dataset.assetName;
+
+
+                    removeUnsortedCard(
+                        assetName,
+                        card
+                    );
+
+                }
+
+            }
+
+        });
+
+
+        animationFrame =
+            requestAnimationFrame(
+                animate
+            );
+
+    }
+
+
+    animationFrame =
+        requestAnimationFrame(
+            animate
+        );
+
+}
+
+
+// =====================================================
+// REMOVE UNSORTED CARD THAT LEFT SCREEN
+// =====================================================
+
+function removeUnsortedCard(
+    assetName,
+    card
+) {
+
+    if (!gameRunning) {
+        return;
+    }
+
+
+    const item =
+        assets.find(
+            asset =>
+                asset.name ===
+                assetName
+        );
+
+
+    if (!item) {
+        return;
+    }
+
+
+    card.remove();
+
+
+    // Put the unsorted asset
+    // back at the end of the queue
+
+    remainingAssets.push(item);
+
+
+    // Bring another item in
+    // after a short delay
+
+    setTimeout(() => {
+
+        if (!gameRunning) {
+            return;
+        }
+
+
+        addNextAssetFromRight();
+
+    }, 500);
+
+}
+
+// =====================================================
+// ADD EXISTING ASSET
+// =====================================================
+
+function addCardForExistingAsset(
+    item
+) {
+
+    const cards =
+        document.querySelectorAll(
+            ".assetCard"
+        );
+
+
+    let rightMost = 0;
+
+
+    cards.forEach(card => {
+
+        const x =
+            parseFloat(
+                card.style.left
+            ) || 0;
+
+
+        if (
+            x >
+            rightMost
+        ) {
+
+            rightMost = x;
+
+        }
+
+    });
+
+
+    const card =
+        document.createElement("div");
+
+
+    card.className =
+        "assetCard";
+
+
+    card.draggable = true;
+
+
+    card.dataset.assetName =
+        item.name;
+
+
+    card.dataset.category =
+        item.category;
+
+
+    card.style.left =
+        (
+            rightMost +
+            CARD_STEP
+        ) + "px";
+
+
+    card.innerHTML = `
+
+        <img
+            src="${item.image}"
+            alt="${item.name}"
+        >
+
+    `;
+
+
+    card.addEventListener(
+        "dragstart",
+        dragStart
+    );
+
+
+    card.addEventListener(
+        "dragend",
+        dragEnd
+    );
+
+
+    belt.appendChild(card);
+
+}
+
 
 // =====================================================
 // MESSAGE
 // =====================================================
 
-function showMessage(text, color) {
+function showMessage(
+    text,
+    color
+) {
 
     const message =
-        document.getElementById("message");
+        document.getElementById(
+            "message"
+        );
 
 
-    message.innerHTML = text;
+    message.innerHTML =
+        text;
 
-    message.style.color = color;
+
+    message.style.color =
+        color;
 
 
-    // Restart animation
+    message.classList.remove(
+        "popup"
+    );
 
-    message.classList.remove("popup");
 
     void message.offsetWidth;
 
-    message.classList.add("popup");
+
+    message.classList.add(
+        "popup"
+    );
 
 
     setTimeout(() => {
 
-        message.classList.remove("popup");
+        message.classList.remove(
+            "popup"
+        );
 
     }, 800);
 
 }
+
 
 // =====================================================
 // CONFETTI
@@ -522,28 +1243,46 @@ function showMessage(text, color) {
 
 function confetti() {
 
-    for (let i = 0; i < 25; i++) {
+    for (
+        let i = 0;
+        i < 25;
+        i++
+    ) {
 
         const piece =
-            document.createElement("div");
+            document.createElement(
+                "div"
+            );
 
 
-        piece.classList.add("piece");
+        piece.classList.add(
+            "piece"
+        );
 
 
         piece.style.left =
-            Math.random() * 100 + "vw";
+            Math.random() *
+            100 +
+            "vw";
 
 
         piece.style.background =
-            `hsl(${Math.random() * 360}, 100%, 60%)`;
+            `hsl(
+                ${Math.random() * 360},
+                100%,
+                60%
+            )`;
 
 
         piece.style.animationDelay =
-            Math.random() * 0.3 + "s";
+            Math.random() *
+            0.3 +
+            "s";
 
 
-        document.body.appendChild(piece);
+        document.body.appendChild(
+            piece
+        );
 
 
         setTimeout(() => {
@@ -556,6 +1295,7 @@ function confetti() {
 
 }
 
+
 // =====================================================
 // TIMER
 // =====================================================
@@ -565,30 +1305,40 @@ function startTimer() {
     clearInterval(timer);
 
 
-    timer = setInterval(() => {
+    timer =
+        setInterval(() => {
 
-        time--;
+            if (!gameRunning) {
+
+                return;
+
+            }
 
 
-        timerDisplay.innerHTML =
-            "⏱ " + time;
+            time--;
 
-
-        if (time <= 0) {
-
-            time = 0;
 
             timerDisplay.innerHTML =
-                "⏱ 0";
+                `⏱ ${time}`;
 
 
-            finishGame();
+            if (time <= 0) {
 
-        }
+                time = 0;
 
-    }, 1000);
+
+                timerDisplay.innerHTML =
+                    "⏱ 0";
+
+
+                finishGame();
+
+            }
+
+        }, 1000);
 
 }
+
 
 // =====================================================
 // FINISH GAME
@@ -596,20 +1346,42 @@ function startTimer() {
 
 function finishGame() {
 
+    if (!gameRunning) {
+
+        return;
+
+    }
+
+
+    gameRunning = false;
+
+    conveyorRunning = false;
+
+
     clearInterval(timer);
 
-    isMoving = true;
+
+    cancelAnimationFrame(
+        animationFrame
+    );
 
 
     let bestScore =
         Number(
-            localStorage.getItem("bestScore")
+            localStorage.getItem(
+                "bestScore"
+            )
         ) || 0;
 
 
-    if (score > bestScore) {
+    if (
+        score >
+        bestScore
+    ) {
 
-        bestScore = score;
+        bestScore =
+            score;
+
 
         localStorage.setItem(
             "bestScore",
@@ -619,21 +1391,24 @@ function finishGame() {
     }
 
 
-    gameScreen.style.display = "none";
+    gameScreen.style.display =
+        "none";
 
-    gameOver.style.display = "block";
+
+    gameOver.style.display =
+        "block";
 
 
     finalScore.innerHTML = `
 
         Your Score : ${score}
-        <br>
-
+        <br><br>
         Best Score : ${bestScore}
 
     `;
 
 }
+
 
 // =====================================================
 // PLAY AGAIN
@@ -649,39 +1424,61 @@ function restartGame() {
 
     clearInterval(timer);
 
+    cancelAnimationFrame(
+        animationFrame
+    );
 
-    currentCard = 0;
+
+    gameRunning = false;
+
+    conveyorRunning = false;
 
     score = 0;
 
-    lives = 3;
+    lives = STARTING_LIVES;
 
-    time = 40;
+    time = GAME_TIME;
 
-    isMoving = false;
+    conveyorPosition = 0;
+
+    draggedCard = null;
+
+    draggedAssetName = null;
 
 
-    document.querySelectorAll(".slot").forEach(slot=>{
-    slot.innerHTML="";
-    });
+    belt.innerHTML = "";
+
+
+    movingConveyor.style.transform =
+        "translateX(0px)";
 
 
     scoreDisplay.innerHTML =
-        "0 / " + assets.length;
+        `0 / ${assets.length}`;
 
 
     livesDisplay.innerHTML =
-        "❤️❤️❤️";
+        "❤️".repeat(
+            STARTING_LIVES
+        );
 
 
     timerDisplay.innerHTML =
-        "⏱ 40";
+        `⏱ ${GAME_TIME}`;
 
 
-    gameOver.style.display = "none";
+    clearFolderIndicators();
 
-    gameScreen.style.display = "none";
 
-    startScreen.style.display = "block";
+    gameOver.style.display =
+        "none";
+
+
+    gameScreen.style.display =
+        "none";
+
+
+    startScreen.style.display =
+        "block";
 
 }
