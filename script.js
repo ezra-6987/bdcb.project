@@ -120,7 +120,7 @@ const assets = [
         id: "money",
         name: "Money",
         image: "images/Money.png",
-        category: "Non-Collateralised"
+        category: "Collateralised"
     },
 
     {
