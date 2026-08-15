@@ -1,6 +1,12 @@
-// =====================================================
+// ============================================================
+// ASSET QUEST
+// Conveyor Sorting Game
+// ============================================================
+
+
+// ============================================================
 // ELEMENTS
-// =====================================================
+// ============================================================
 
 const startButton =
     document.getElementById("startButton");
@@ -38,8 +44,11 @@ const message =
 const folders =
     document.querySelectorAll(".folder");
 
-const conveyorTrack =
-    document.getElementById("movingConveyor");
+const collateralImage =
+    document.getElementById("collateralImage");
+
+const nonCollateralImage =
+    document.getElementById("nonCollateralImage");
 
 const correctSound =
     document.getElementById("correctSound");
@@ -54,9 +63,39 @@ const clickSound =
     document.getElementById("clickSound");
 
 
-// =====================================================
+// ============================================================
+// FOLDER IMAGES
+// ============================================================
+
+const folderImages = {
+
+    collateral: {
+
+        normal:
+            "images/Collateral.png",
+
+        wrong:
+            "images/Wrong_Collateral.png"
+
+    },
+
+
+    nonCollateral: {
+
+        normal:
+            "images/Non-Collateral.png",
+
+        wrong:
+            "images/Wrong_Non-Collateral.png"
+
+    }
+
+};
+
+
+// ============================================================
 // ASSETS
-// =====================================================
+// ============================================================
 
 const assets = [
 
@@ -64,7 +103,7 @@ const assets = [
         id: "property",
         name: "Property",
         image: "images/Property.png",
-        category: "Collateralised"
+        category: "Non-Collateralised"
     },
 
     {
@@ -78,7 +117,7 @@ const assets = [
         id: "rentals",
         name: "Rentals",
         image: "images/Rentals.png",
-        category: "Collateralised"
+        category: "Non-Collateralised"
     },
 
     {
@@ -120,7 +159,7 @@ const assets = [
         id: "money",
         name: "Money",
         image: "images/Money.png",
-        category: "Collateralised"
+        category: "Non-Collateralised"
     },
 
     {
@@ -141,7 +180,7 @@ const assets = [
         id: "land",
         name: "Land",
         image: "images/Land.png",
-        category: "Collateralised"
+        category: "Non-Collateralised"
     },
 
     {
@@ -154,93 +193,134 @@ const assets = [
 ];
 
 
-// =====================================================
+// ============================================================
+// GAME SETTINGS
+// ============================================================
+
+const GAME_TIME = 30;
+
+const TOTAL_LIVES = 3;
+
+
+// Number of cards visible initially
+
+const INITIAL_CARD_COUNT = 4;
+
+
+// Distance a card moves every second
+
+const CARD_SPEED = 80;
+
+
+// Time before a replacement card enters
+
+const SPAWN_DELAY = 2000;
+
+
+// Conveyor dimensions
+
+const CONVEYOR_WIDTH = 900;
+
+const CARD_WIDTH = 110;
+
+const CARD_HEIGHT = 130;
+
+
+// Card starting position
+
+const ENTRY_POSITION =
+    CONVEYOR_WIDTH + 20;
+
+
+// Position where card has completely left
+
+const EXIT_POSITION =
+    -CARD_WIDTH - 20;
+
+
+// Minimum horizontal distance between cards
+
+const MIN_CARD_SPACING = 190;
+
+
+// ============================================================
 // GAME VARIABLES
-// =====================================================
-
-let activeAssets = [];
-
-let score = 0;
-
-let lives = 3;
-
-let time = 40;
-
-let timer = null;
+// ============================================================
 
 let gameRunning = false;
 
+let score = 0;
 
-// =====================================================
-// CONVEYOR VARIABLES
-// =====================================================
+let lives = TOTAL_LIVES;
+
+let time = GAME_TIME;
+
+let timer = null;
 
 let animationFrame = null;
 
 let lastFrameTime = null;
 
-let spawnTimer = null;
 
-let nextAssetIndex = 0;
+// ============================================================
+// ASSET QUEUE
+// ============================================================
 
-let processedAssets = 0;
+// Assets waiting to appear
 
-
-// Cards currently visible on conveyor
-//
-// Map:
-// asset ID -> card information
-
-const activeCards =
-    new Map();
+let assetQueue = [];
 
 
-// =====================================================
-// CONVEYOR SETTINGS
-// =====================================================
+// ============================================================
+// ACTIVE CARDS
+// ============================================================
 
-// Card movement speed
+// Cards currently on conveyor
 
-const CARD_SPEED = 55;
-
-
-// Delay before a replacement card
-// appears after player removes a card
-
-const SPAWN_DELAY = 2000;
+const activeCards = new Map();
 
 
-// Number of cards normally visible
+// ============================================================
+// PENDING SPAWNS
+// ============================================================
 
-const MAX_VISIBLE_CARDS = 4;
+// Each value is the time when another card may enter
 
+let pendingSpawns = [];
 
-// Starting positions for the
-// initial cards
-
-const START_POSITIONS = [
-    80,
-    300,
-    520,
-    740
-];
+let spawnCheckTimer = null;
 
 
-// Position where new cards enter
+// ============================================================
+// SORTING COUNT
+// ============================================================
 
-const CONVEYOR_ENTRY = 920;
+let sortedCount = 0;
 
 
-
-// =====================================================
-// START GAME
-// =====================================================
+// ============================================================
+// START BUTTON
+// ============================================================
 
 startButton.addEventListener(
     "click",
     startGame
 );
 
+
+// ============================================================
+// PLAY AGAIN
+// ============================================================
+
+playAgain.addEventListener(
+    "click",
+    startGame
+);
+
+
+// ============================================================
+// START GAME
+// ============================================================
 
 function startGame() {
 
@@ -250,8 +330,10 @@ function startGame() {
     startScreen.style.display =
         "none";
 
+
     gameOver.style.display =
         "none";
+
 
     gameScreen.style.display =
         "block";
@@ -260,75 +342,126 @@ function startGame() {
     gameRunning = true;
 
 
-    // Restart conveyor artwork
-
-    conveyorTrack.style.animationPlayState =
-        "running";
-
-
-    // Click sound
-
     playSound(clickSound);
 
 
-    // Timer
+    updateDisplays();
+
 
     startTimer();
 
 
-    // Start card movement
+    createInitialCards();
+
 
     startConveyor();
-
-
-    // Put first cards on conveyor
-
-    startInitialCards();
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // RESET GAME
-// =====================================================
+// ============================================================
 
 function resetGame() {
 
+    // Stop everything
+
     clearInterval(timer);
 
-    clearTimeout(spawnTimer);
+    clearTimeout(spawnCheckTimer);
 
-    cancelAnimationFrame(
-        animationFrame
-    );
+    cancelAnimationFrame(animationFrame);
 
 
-    activeAssets =
-        shuffleArray(assets);
+    timer = null;
 
+    spawnCheckTimer = null;
 
-    score = 0;
-
-    lives = 3;
-
-    time = 40;
-
-    nextAssetIndex = 0;
-
-    processedAssets = 0;
-
-    gameRunning = false;
+    animationFrame = null;
 
     lastFrameTime = null;
 
 
+    // Reset values
+
+    score = 0;
+
+    lives = TOTAL_LIVES;
+
+    time = GAME_TIME;
+
+    sortedCount = 0;
+
+
+    gameRunning = false;
+
+
+    // Clear cards
+
+    activeCards.forEach(
+        cardData => {
+
+            cardData.element.remove();
+
+        }
+    );
+
+
     activeCards.clear();
+
+
+    // Clear pending spawns
+
+    pendingSpawns = [];
+
+
+    // Create fresh shuffled queue
+
+    assetQueue =
+        shuffleArray(assets);
+
+
+    // Clear belt
 
     belt.innerHTML = "";
 
 
+    // Reset folders
+
+    resetFolders();
+
+
+    // Clear message
+
+    if (message) {
+
+        message.textContent = "";
+
+        message.classList.remove(
+            "popup"
+        );
+
+    }
+
+
     updateDisplays();
+
+}
+
+
+// ============================================================
+// RESET FOLDERS
+// ============================================================
+
+function resetFolders() {
+
+    collateralImage.src =
+        folderImages.collateral.normal;
+
+
+    nonCollateralImage.src =
+        folderImages.nonCollateral.normal;
 
 
     folders.forEach(
@@ -345,19 +478,18 @@ function resetGame() {
 }
 
 
-
-// =====================================================
-// SHUFFLE ASSETS
-// =====================================================
+// ============================================================
+// SHUFFLE
+// ============================================================
 
 function shuffleArray(array) {
 
-    const shuffled =
+    const result =
         [...array];
 
 
     for (
-        let i = shuffled.length - 1;
+        let i = result.length - 1;
         i > 0;
         i--
     ) {
@@ -370,49 +502,47 @@ function shuffleArray(array) {
 
 
         [
-            shuffled[i],
-            shuffled[j]
-        ] =
-        [
-            shuffled[j],
-            shuffled[i]
+            result[i],
+            result[j]
+
+        ] = [
+
+            result[j],
+            result[i]
+
         ];
 
     }
 
 
-    return shuffled;
+    return result;
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // UPDATE DISPLAY
-// =====================================================
+// ============================================================
 
 function updateDisplays() {
 
-    timerDisplay.innerHTML =
-        "⏱ " + time;
+    timerDisplay.textContent =
+        `⏱ ${time}`;
 
 
-    scoreDisplay.innerHTML =
-        score +
-        " / " +
-        assets.length;
+    scoreDisplay.textContent =
+        `${score} / ${assets.length}`;
 
 
-    livesDisplay.innerHTML =
+    livesDisplay.textContent =
         "❤️".repeat(lives);
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // TIMER
-// =====================================================
+// ============================================================
 
 function startTimer() {
 
@@ -431,14 +561,15 @@ function startTimer() {
                 time--;
 
 
+                if (time < 0) {
+                    time = 0;
+                }
+
+
                 updateDisplays();
 
 
                 if (time <= 0) {
-
-                    time = 0;
-
-                    updateDisplays();
 
                     finishGame();
 
@@ -451,10 +582,9 @@ function startTimer() {
 }
 
 
-
-// =====================================================
+// ============================================================
 // START CONVEYOR
-// =====================================================
+// ============================================================
 
 function startConveyor() {
 
@@ -474,10 +604,9 @@ function startConveyor() {
 }
 
 
-
-// =====================================================
+// ============================================================
 // MOVE CARDS
-// =====================================================
+// ============================================================
 
 function moveCards(timestamp) {
 
@@ -495,18 +624,25 @@ function moveCards(timestamp) {
 
 
     const deltaTime =
-        (
-            timestamp -
-            lastFrameTime
-        ) / 1000;
+        Math.min(
+            (
+                timestamp -
+                lastFrameTime
+            ) / 1000,
+            0.05
+        );
 
 
     lastFrameTime =
         timestamp;
 
 
-    const cardsToRemove = [];
+    const cardsLeaving = [];
 
+
+    // --------------------------------------------------------
+    // MOVE ALL CARDS LEFT
+    // --------------------------------------------------------
 
     activeCards.forEach(
         cardData => {
@@ -517,20 +653,17 @@ function moveCards(timestamp) {
 
 
             cardData.element.style.left =
-                cardData.x + "px";
+                `${cardData.x}px`;
 
 
-            /*
-                Card has travelled completely
-                off the left side.
-            */
+            // Card completely leaves conveyor
 
             if (
-                cardData.x <
-                -cardData.element.offsetWidth
+                cardData.x <=
+                EXIT_POSITION
             ) {
 
-                cardsToRemove.push(
+                cardsLeaving.push(
                     cardData.id
                 );
 
@@ -540,37 +673,49 @@ function moveCards(timestamp) {
     );
 
 
-    /*
-        Remove cards that have
-        reached the end.
-    */
+    // --------------------------------------------------------
+    // HANDLE CARDS THAT LEFT
+    // --------------------------------------------------------
 
-    cardsToRemove.forEach(
+    cardsLeaving.forEach(
         cardId => {
+
+            const cardData =
+                activeCards.get(cardId);
+
+
+            if (!cardData) {
+                return;
+            }
+
+
+            // The player did not sort it.
+            // Put it back at the end of queue.
+
+            assetQueue.push(
+                cardData.item
+            );
+
 
             removeCardFromConveyor(
                 cardId
             );
 
-            /*
-                This card was NOT dragged.
-                It simply reached the end.
-                We still count it as processed
-                so that the game doesn't
-                continue forever.
-            */
 
-            processedAssets++;
+            // Schedule replacement
 
-            keepConveyorMoving();
+            scheduleReplacement();
 
         }
     );
 
 
-    /*
-        Continue animation.
-    */
+    // Process cards waiting to enter
+
+    processPendingSpawns();
+
+
+    // Continue animation
 
     animationFrame =
         requestAnimationFrame(
@@ -580,21 +725,40 @@ function moveCards(timestamp) {
 }
 
 
+// ============================================================
+// CREATE INITIAL CARDS
+// ============================================================
 
-// =====================================================
-// INITIAL CARDS
-// =====================================================
+function createInitialCards() {
 
-function startInitialCards() {
+    const startingPositions = [
+
+        80,
+        300,
+        520,
+        740
+
+    ];
+
 
     for (
         let i = 0;
-        i < START_POSITIONS.length;
+        i < INITIAL_CARD_COUNT;
         i++
     ) {
 
-        spawnNextCard(
-            START_POSITIONS[i]
+        const item =
+            getNextAsset();
+
+
+        if (!item) {
+            break;
+        }
+
+
+        createCard(
+            item,
+            startingPositions[i]
         );
 
     }
@@ -602,66 +766,52 @@ function startInitialCards() {
 }
 
 
+// ============================================================
+// GET NEXT ASSET
+// ============================================================
 
-// =====================================================
-// SPAWN NEXT CARD
-// =====================================================
-
-function spawnNextCard(
-    position = CONVEYOR_ENTRY
-) {
-
-    if (!gameRunning) {
-        return;
-    }
-
-
-    /*
-        All assets have already
-        entered the conveyor.
-    */
+function getNextAsset() {
 
     if (
-        nextAssetIndex >=
-        activeAssets.length
+        assetQueue.length === 0
     ) {
 
-        return;
+        return null;
 
     }
 
 
-    const item =
-        activeAssets[
-            nextAssetIndex
-        ];
-
-
-    nextAssetIndex++;
-
-
-    createCard(
-        item,
-        position
-    );
+    return assetQueue.shift();
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // CREATE CARD
-// =====================================================
+// ============================================================
 
 function createCard(
     item,
     position
 ) {
 
+    if (!gameRunning) {
+        return null;
+    }
+
+
+    // Unique ID for this card
+
+    const instanceId =
+        `${item.id}-${Date.now()}-${Math.random()
+            .toString(36)
+            .substring(2)}`;
+
+
+    // Create card
+
     const card =
-        document.createElement(
-            "div"
-        );
+        document.createElement("div");
 
 
     card.className =
@@ -669,6 +819,10 @@ function createCard(
 
 
     card.dataset.id =
+        instanceId;
+
+
+    card.dataset.assetId =
         item.id;
 
 
@@ -676,22 +830,30 @@ function createCard(
         item.category;
 
 
+    card.draggable = true;
+
+
+    // ONLY IMAGE
+    // No duplicate title
+
     card.innerHTML = `
+
         <img
             src="${item.image}"
             alt="${item.name}"
+            draggable="false"
         >
+
     `;
 
 
+    // Position
+
     card.style.left =
-        position + "px";
+        `${position}px`;
 
 
-    /*
-        Center the card vertically
-        on the conveyor.
-    */
+    // Vertically centred
 
     card.style.top =
         "50%";
@@ -701,9 +863,7 @@ function createCard(
         "translateY(-50%)";
 
 
-    card.draggable =
-        true;
-
+    // Drag events
 
     card.addEventListener(
         "dragstart",
@@ -717,28 +877,37 @@ function createCard(
     );
 
 
-    belt.appendChild(
-        card
-    );
+    // Add to conveyor
 
+    belt.appendChild(card);
+
+
+    // Register card
 
     activeCards.set(
-        item.id,
+        instanceId,
         {
-            id: item.id,
+
+            id: instanceId,
+
             item: item,
+
             element: card,
+
             x: position
+
         }
     );
+
+
+    return instanceId;
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // DRAG START
-// =====================================================
+// ============================================================
 
 function handleDragStart(event) {
 
@@ -759,6 +928,17 @@ function handleDragStart(event) {
         card.dataset.id;
 
 
+    if (
+        !activeCards.has(cardId)
+    ) {
+
+        event.preventDefault();
+
+        return;
+
+    }
+
+
     event.dataTransfer.setData(
         "cardId",
         cardId
@@ -776,10 +956,9 @@ function handleDragStart(event) {
 }
 
 
-
-// =====================================================
+// ============================================================
 // DRAG END
-// =====================================================
+// ============================================================
 
 function handleDragEnd(event) {
 
@@ -790,13 +969,13 @@ function handleDragEnd(event) {
 }
 
 
-
-// =====================================================
+// ============================================================
 // FOLDER EVENTS
-// =====================================================
+// ============================================================
 
 folders.forEach(
     folder => {
+
 
         folder.addEventListener(
             "dragover",
@@ -818,21 +997,6 @@ folders.forEach(
 
 
         folder.addEventListener(
-            "dragenter",
-            event => {
-
-                if (!gameRunning) {
-                    return;
-                }
-
-
-                event.preventDefault();
-
-            }
-        );
-
-
-        folder.addEventListener(
             "drop",
             handleDrop
         );
@@ -841,10 +1005,9 @@ folders.forEach(
 );
 
 
-
-// =====================================================
+// ============================================================
 // HANDLE DROP
-// =====================================================
+// ============================================================
 
 function handleDrop(event) {
 
@@ -868,9 +1031,7 @@ function handleDrop(event) {
 
 
     const cardData =
-        activeCards.get(
-            cardId
-        );
+        activeCards.get(cardId);
 
 
     if (!cardData) {
@@ -878,8 +1039,12 @@ function handleDrop(event) {
     }
 
 
+    const folder =
+        event.currentTarget;
+
+
     const chosenCategory =
-        this.dataset.category;
+        folder.dataset.category;
 
 
     const correct =
@@ -887,81 +1052,83 @@ function handleDrop(event) {
         chosenCategory;
 
 
-
-    // =================================================
-    // REMOVE CARD IMMEDIATELY
-    // =================================================
+    // ========================================================
+    // IMPORTANT
+    // ========================================================
+    //
+    // REMOVE THE CARD IMMEDIATELY.
+    //
+    // THIS HAPPENS FOR BOTH CORRECT AND WRONG.
+    //
+    // The card NEVER stays on the conveyor.
+    // The card NEVER gets placed inside the folder.
+    //
+    // ========================================================
 
     removeCardFromConveyor(
         cardId
     );
 
 
-    /*
-        IMPORTANT:
+    // Schedule next card
 
-        Whether the answer is correct
-        OR wrong, the card is gone.
-
-        It is NOT inserted into the folder.
-    */
-
-    processedAssets++;
+    scheduleReplacement();
 
 
-
-    // =================================================
+    // ========================================================
     // CORRECT
-    // =================================================
+    // ========================================================
 
     if (correct) {
 
         score++;
 
-        updateDisplays();
 
         showFolderResult(
-            this,
+            folder,
             true
         );
+
 
         showMessage(
             "✔ CORRECT",
             "#16a34a"
         );
 
+
         playSound(
             correctSound
         );
+
 
         confetti();
 
     }
 
 
-    // =================================================
+    // ========================================================
     // WRONG
-    // =================================================
+    // ========================================================
 
     else {
 
-        /*
-            DO NOT increase score.
-        */
+        // IMPORTANT:
+        // DO NOT increase score.
 
         lives--;
 
-        updateDisplays();
 
         showFolderResult(
-            this,
+            folder,
             false
         );
+
 
         showMessage(
             "✖ WRONG",
             "#dc2626"
         );
+
 
         playSound(
             wrongSound
@@ -970,9 +1137,18 @@ function handleDrop(event) {
     }
 
 
-    // =================================================
+    // This counts as sorted regardless
+    // of whether the answer was right or wrong.
+
+    sortedCount++;
+
+
+    updateDisplays();
+
+
+    // ========================================================
     // NO LIVES
-    // =================================================
+    // ========================================================
 
     if (lives <= 0) {
 
@@ -983,81 +1159,98 @@ function handleDrop(event) {
     }
 
 
-    // =================================================
-    // ALL ASSETS PROCESSED
-    // =================================================
+    // ========================================================
+    // ALL ASSETS SORTED
+    // ========================================================
 
     if (
-        processedAssets >=
+        sortedCount >=
         assets.length
     ) {
 
         finishGame();
 
-        return;
-
     }
-
-
-    // =================================================
-    // BRING NEXT CARD AFTER 2 SECONDS
-    // =================================================
-
-    scheduleNextCard();
 
 }
 
 
-
-// =====================================================
-// REMOVE CARD
-// =====================================================
+// ============================================================
+// REMOVE CARD FROM CONVEYOR
+// ============================================================
 
 function removeCardFromConveyor(
     cardId
 ) {
 
     const cardData =
-        activeCards.get(
-            cardId
-        );
+        activeCards.get(cardId);
 
 
     if (!cardData) {
-        return;
+        return false;
     }
 
+
+    // Remove from active map
 
     activeCards.delete(
         cardId
     );
 
 
-    cardData.element.remove();
+    // Remove actual DOM element
+
+    if (
+        cardData.element &&
+        cardData.element.parentNode
+    ) {
+
+        cardData.element.remove();
+
+    }
+
+
+    return true;
 
 }
 
 
+// ============================================================
+// SCHEDULE REPLACEMENT
+// ============================================================
 
-// =====================================================
-// SCHEDULE NEXT CARD
-// =====================================================
+function scheduleReplacement() {
 
-function scheduleNextCard() {
+    if (!gameRunning) {
+        return;
+    }
 
-    clearTimeout(
-        spawnTimer
+
+    pendingSpawns.push(
+        Date.now() +
+        SPAWN_DELAY
     );
 
 
+    processPendingSpawns();
+
+}
+
+
+// ============================================================
+// PROCESS PENDING SPAWNS
+// ============================================================
+
+function processPendingSpawns() {
+
     if (!gameRunning) {
         return;
     }
 
 
     if (
-        nextAssetIndex >=
-        activeAssets.length
+        pendingSpawns.length === 0
     ) {
 
         return;
@@ -1065,110 +1258,225 @@ function scheduleNextCard() {
     }
 
 
-    spawnTimer =
+    const now =
+        Date.now();
+
+
+    const nextSpawn =
+        pendingSpawns[0];
+
+
+    // Not ready yet
+
+    if (
+        nextSpawn > now
+    ) {
+
+        scheduleSpawnCheck(
+            nextSpawn - now
+        );
+
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // WAIT UNTIL THERE IS SPACE
+    // --------------------------------------------------------
+
+    if (
+        !hasEnoughSpaceForNewCard()
+    ) {
+
+        scheduleSpawnCheck(100);
+
+        return;
+
+    }
+
+
+    // Get next asset
+
+    const item =
+        getNextAsset();
+
+
+    // No asset available
+
+    if (!item) {
+
+        pendingSpawns.shift();
+
+        return;
+
+    }
+
+
+    // Remove pending spawn
+
+    pendingSpawns.shift();
+
+
+    // Create new card at right side
+
+    createCard(
+        item,
+        ENTRY_POSITION
+    );
+
+
+    // Process another waiting spawn if possible
+
+    processPendingSpawns();
+
+}
+
+
+// ============================================================
+// SPAWN CHECK TIMER
+// ============================================================
+
+function scheduleSpawnCheck(
+    delay
+) {
+
+    clearTimeout(
+        spawnCheckTimer
+    );
+
+
+    spawnCheckTimer =
         setTimeout(
             () => {
 
-                if (!gameRunning) {
-                    return;
-                }
+                spawnCheckTimer =
+                    null;
 
 
-                spawnNextCard(
-                    CONVEYOR_ENTRY
-                );
-
+                processPendingSpawns();
 
             },
-            SPAWN_DELAY
+            Math.max(
+                50,
+                delay
+            )
         );
 
 }
 
 
+// ============================================================
+// PREVENT CARD STACKING
+// ============================================================
 
-// =====================================================
-// KEEP CONVEYOR POPULATED
-// =====================================================
-
-function keepConveyorMoving() {
-
-    if (!gameRunning) {
-        return;
-    }
-
-
-    /*
-        Don't add anything if all
-        assets have already entered.
-    */
+function hasEnoughSpaceForNewCard() {
 
     if (
-        nextAssetIndex >=
-        activeAssets.length
+        activeCards.size === 0
     ) {
 
-        return;
+        return true;
 
     }
 
 
-    /*
-        Keep at least 4 cards visible.
-
-        A slight delay prevents cards
-        from appearing immediately
-        on top of each other.
-    */
-
-    if (
-        activeCards.size <
-        MAX_VISIBLE_CARDS
-    ) {
-
-        clearTimeout(
-            spawnTimer
-        );
+    let rightmostX =
+        -Infinity;
 
 
-        spawnTimer =
-            setTimeout(
-                () => {
+    activeCards.forEach(
+        cardData => {
 
-                    if (!gameRunning) {
-                        return;
-                    }
+            if (
+                cardData.x >
+                rightmostX
+            ) {
+
+                rightmostX =
+                    cardData.x;
+
+            }
+
+        }
+    );
 
 
-                    if (
-                        activeCards.size <
-                        MAX_VISIBLE_CARDS
-                    ) {
-
-                        spawnNextCard(
-                            CONVEYOR_ENTRY
-                        );
-
-                    }
-
-                },
-                1000
-            );
-
-    }
+    return (
+        rightmostX <=
+        ENTRY_POSITION -
+        MIN_CARD_SPACING
+    );
 
 }
 
 
-
-// =====================================================
+// ============================================================
 // FOLDER RESULT
-// =====================================================
+// ============================================================
+//
+// CORRECT:
+// Folder remains its normal green design.
+//
+// WRONG:
+// Folder changes permanently to the red version.
+//
+// The card itself is NOT placed inside the folder.
+//
+// ============================================================
 
 function showFolderResult(
     folder,
     correct
 ) {
+
+    const image =
+        folder.querySelector(
+            ".folderImage"
+        );
+
+
+    if (!image) {
+        return;
+    }
+
+
+    // ========================================================
+    // COLLATERALISED
+    // ========================================================
+
+    if (
+        folder.id ===
+        "collateral"
+    ) {
+
+        image.src =
+            correct
+                ? folderImages.collateral.normal
+                : folderImages.collateral.wrong;
+
+    }
+
+
+    // ========================================================
+    // NON-COLLATERALISED
+    // ========================================================
+
+    else if (
+        folder.id ===
+        "nonCollateral"
+    ) {
+
+        image.src =
+            correct
+                ? folderImages.nonCollateral.normal
+                : folderImages.nonCollateral.wrong;
+
+    }
+
+
+    // Small visual feedback
 
     folder.classList.remove(
         "correctDrop",
@@ -1195,33 +1503,24 @@ function showFolderResult(
 
     }
 
-
-    setTimeout(
-        () => {
-
-            folder.classList.remove(
-                "correctDrop",
-                "wrongDrop"
-            );
-
-        },
-        900
-    );
-
 }
 
 
-
-// =====================================================
+// ============================================================
 // MESSAGE
-// =====================================================
+// ============================================================
 
 function showMessage(
     text,
     color
 ) {
 
-    message.innerHTML =
+    if (!message) {
+        return;
+    }
+
+
+    message.textContent =
         text;
 
 
@@ -1256,22 +1555,18 @@ function showMessage(
 }
 
 
-
-// =====================================================
+// ============================================================
 // SOUND
-// =====================================================
+// ============================================================
 
-function playSound(
-    sound
-) {
+function playSound(sound) {
 
     if (!sound) {
         return;
     }
 
 
-    sound.currentTime =
-        0;
+    sound.currentTime = 0;
 
 
     sound.play().catch(
@@ -1281,10 +1576,9 @@ function playSound(
 }
 
 
-
-// =====================================================
+// ============================================================
 // CONFETTI
-// =====================================================
+// ============================================================
 
 function confetti() {
 
@@ -1305,9 +1599,7 @@ function confetti() {
 
 
         piece.style.left =
-            Math.random() *
-            100 +
-            "vw";
+            `${Math.random() * 100}vw`;
 
 
         piece.style.background =
@@ -1319,9 +1611,7 @@ function confetti() {
 
 
         piece.style.animationDelay =
-            Math.random() *
-            0.3 +
-            "s";
+            `${Math.random() * 0.3}s`;
 
 
         document.body.appendChild(
@@ -1343,58 +1633,73 @@ function confetti() {
 }
 
 
-
-// =====================================================
+// ============================================================
 // FINISH GAME
-// =====================================================
+// ============================================================
 
 function finishGame() {
+
+    // Prevent duplicate calls
 
     if (!gameRunning) {
         return;
     }
 
 
+    // ========================================================
+    // STOP GAME
+    // ========================================================
+
     gameRunning = false;
 
 
-    // Stop timer
+    // ========================================================
+    // STOP TIMER
+    // ========================================================
 
-    clearInterval(
-        timer
-    );
+    clearInterval(timer);
 
-
-    // Stop pending spawn
-
-    clearTimeout(
-        spawnTimer
-    );
+    timer = null;
 
 
-    // Stop card animation
+    // ========================================================
+    // STOP CONVEYOR ANIMATION
+    // ========================================================
 
     cancelAnimationFrame(
         animationFrame
     );
 
-
-    animationFrame =
-        null;
+    animationFrame = null;
 
 
-    // Stop conveyor artwork
+    // ========================================================
+    // STOP SPAWN SYSTEM
+    // ========================================================
 
-    conveyorTrack.style.animationPlayState =
-        "paused";
+    clearTimeout(
+        spawnCheckTimer
+    );
+
+    spawnCheckTimer = null;
 
 
-    // Final score
+    pendingSpawns = [];
 
-    finalScore.innerHTML = `
-        Your Score:
-        ${score} / ${assets.length}
-    `;
+
+    // ========================================================
+    // UPDATE FINAL DISPLAY
+    // ========================================================
+
+    updateDisplays();
+
+
+    // ========================================================
+    // SHOW GAME OVER
+    // ========================================================
+
+    finalScore.textContent =
+        `Score: ${score} / ${assets.length}`;
 
 
     gameScreen.style.display =
@@ -1410,27 +1715,3 @@ function finishGame() {
     );
 
 }
-
-
-
-// =====================================================
-// PLAY AGAIN
-// =====================================================
-
-playAgain.addEventListener(
-    "click",
-    () => {
-
-        gameOver.style.display =
-            "none";
-
-
-        startScreen.style.display =
-            "block";
-
-
-        conveyorTrack.style.animationPlayState =
-            "running";
-
-    }
-);

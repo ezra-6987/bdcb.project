@@ -1,281 +1,225 @@
-/* =====================================================
+/* =========================================================
    GLOBAL
-   ===================================================== */
+   ========================================================= */
 
+* {
+    box-sizing: border-box;
+}
+
+html,
 body {
     margin: 0;
+    padding: 0;
+
+    width: 100%;
+    min-height: 100%;
+
     font-family: Arial, sans-serif;
 
-    color: rgb(5, 153, 12);
     text-align: center;
 
+    color: rgb(5, 153, 12);
+
     background-image: url("images/background.png");
+
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
 
-    min-height: 100vh;
+    background-attachment: fixed;
 }
 
 
-/* =====================================================
+/* =========================================================
    START SCREEN
-   ===================================================== */
+   ========================================================= */
 
 #startScreen {
-    margin-top: 100px;
+    min-height: 100vh;
+
+    display: flex;
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    gap: 15px;
 }
 
-h1 {
-    font-size: 60px;
-}
+#startScreen h3 {
+    margin: 0;
 
-h3 {
     font-size: 30px;
+
+    font-family: cursive;
+
     color: #f81111;
 }
+
+#startScreen h1 {
+    margin: 0;
+
+    font-size: 60px;
+
+    font-family: fantasy;
+
+    font-weight: lighter;
+
+    color: rgb(5, 153, 12);
+}
+
+#startScreen p {
+    font-size: 25px;
+
+    color: #0457b6;
+
+    font-family: cursive;
+
+    font-weight:bold;
+
+    margin-top: 10px;
+}
+
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
 
 button {
     width: 180px;
     height: 70px;
 
-    font-size: 30px;
+    font-size: 25px;
+
+    font-family:monospace;
+
     cursor: pointer;
+
+    border: none;
+
+    border-radius: 10px;
+
+    background: #28796f;
+
+    color: white;
+
+    transition:
+        transform 0.2s ease,
+        background 0.2s ease;
+}
+
+button:hover {
+    transform: scale(1.05);
+
+    background: #1f625a;
+}
+
+button:active {
+    transform: scale(0.98);
 }
 
 
-/* =====================================================
+/* =========================================================
    GAME SCREEN
-   ===================================================== */
+   ========================================================= */
 
 #gameScreen {
     display: none;
+
+    width: 100%;
+
+    min-height: 100vh;
+
+    position: relative;
+
+    padding-top: 1px;
 }
 
 
-/* =====================================================
+/* =========================================================
    TOP BAR
-   ===================================================== */
+   ========================================================= */
 
 #topBar {
+    width: 100%;
+
     display: flex;
+
     justify-content: space-between;
     align-items: center;
 
-    padding: 20px;
+    padding: 10px 22px;
 
     font-size: 28px;
-}
 
-
-/* =====================================================
-   CARD AREA
-   ===================================================== */
-
-#cardArea {
-    width: 250px;
-    height: 280px;
-
-    margin: 50px auto;
-}
-
-
-/* =====================================================
-   DROP AREA
-   ===================================================== */
-
-#dropArea {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    gap: 80px;
-
-    margin-top: 40px;
-}
-
-
-/* =====================================================
-   FOLDERS
-   ===================================================== */
-
-.folder {
-    position: relative;
-
-    width: 300px;
-    height: 180px;
-
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
-    background: transparent;
-    border: none;
-    box-shadow: none;
-
-    cursor: pointer;
-
-    transition: transform 0.2s ease;
-}
-
-.folder:hover {
-    transform: scale(1.05);
-}
-
-
-/* Folder image */
-
-#collateral,
-#nonCollateral,
-.folderImage {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
-
-    pointer-events: none;
-}
-
-
-/* Hide original folder text */
-
-.folder span {
-    display: none;
-}
-
-
-/* =====================================================
-   OLD CARD STYLES
-   ===================================================== */
-
-.card {
-    width: 220px;
-
-    background: white;
-    color: black;
-
-    border-radius: 15px;
-    padding: 10px;
-
-    margin: auto;
-
-    box-shadow:
-        0 5px 15px rgba(0, 0, 0, 0.4);
-
-    cursor: grab;
-}
-
-.card img {
-    width: 9%;
-    border-radius: 10px;
-}
-
-.card h2 {
-    text-align: center;
-}
-
-.card:active {
-    cursor: grabbing;
-    transform: scale(1.05);
-}
-
-
-/* =====================================================
-   SLIDE ANIMATIONS
-   ===================================================== */
-
-@keyframes slideOut {
-
-    from {
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-    to {
-        opacity: 0;
-        transform: translateX(-300px);
-    }
-
-}
-
-@keyframes slideIn {
-
-    from {
-        opacity: 0;
-        transform: translateX(300px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-
-}
-
-.slideOut {
-    animation: slideOut 0.35s forwards;
-}
-
-.slideIn {
-    animation: slideIn 0.35s;
-}
-
-
-/* =====================================================
-   BOUNCE
-   ===================================================== */
-
-@keyframes bounce {
-
-    0% {
-        transform: scale(1);
-    }
-
-    50% {
-        transform: scale(1.15);
-    }
-
-    100% {
-        transform: scale(1);
-    }
-
-}
-
-.bounce {
-    animation: bounce 0.4s;
-}
-
-
-/* =====================================================
-   CORRECT / WRONG MESSAGE
-   ===================================================== */
-
-#message {
-    position: absolute;
-
-    top: 130px;
-    width: 100%;
-
-    text-align: center;
-
-    font-size: 50px;
     font-weight: bold;
 
-    color: white;
+    position: relative;
+
+    z-index: 500;
+}
+
+#timer {
+    color: rgb(5, 153, 12);
+
+    min-width: 100px;
+
+    text-align: left;
+}
+
+#score {
+    color: rgb(5, 153, 12);
+
+    min-width: 120px;
+
+    text-align: center;
+}
+
+#lives {
+    color: #e7192c;
+
+    min-width: 120px;
+
+    text-align: right;
+
+    white-space: nowrap;
+}
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+#message {
+    position: fixed;
+
+    top: 100px;
+    left: 50%;
+
+    transform: translateX(-50%);
+
+    width: 100%;
+
+    text-align: center;
+
+    font-size: 48px;
+
+    font-weight: bold;
 
     pointer-events: none;
 
     opacity: 0;
+
+    z-index: 1000;
 }
 
 @keyframes popup {
 
     0% {
         opacity: 0;
-        transform: translateY(40px);
+
+        transform:
+            translate(-50%, 30px);
     }
 
     20% {
@@ -284,104 +228,35 @@ button {
 
     100% {
         opacity: 0;
-        transform: translateY(-50px);
-    }
 
+        transform:
+            translate(-50%, -50px);
+    }
 }
 
 .popup {
-    animation: popup 0.8s;
+    animation: popup 0.8s ease forwards;
 }
 
 
-/* =====================================================
-   CONFETTI
-   ===================================================== */
+/* =========================================================
+   CARD / CONVEYOR CONTAINER
+   ========================================================= */
 
-.piece {
-    position: absolute;
+#cardContainer {
+    width: 100%;
 
-    width: 10px;
-    height: 10px;
+    display: flex;
 
-    top: -20px;
+    justify-content: center;
 
-    animation: fall 3s linear;
-}
-
-@keyframes fall {
-
-    to {
-        transform:
-            translateY(110vh)
-            rotate(720deg);
-    }
-
+    margin-top: 5px;
 }
 
 
-/* =====================================================
-   SHAKE
-   ===================================================== */
-
-@keyframes shake {
-
-    0% {
-        transform: translateX(0);
-    }
-
-    25% {
-        transform: translateX(-15px);
-    }
-
-    50% {
-        transform: translateX(15px);
-    }
-
-    75% {
-        transform: translateX(-15px);
-    }
-
-    100% {
-        transform: translateX(0);
-    }
-
-}
-
-.shake {
-    animation: shake 0.4s;
-}
-
-
-/* =====================================================
-   GAME OVER
-   ===================================================== */
-
-#gameOver {
-    display: none;
-
-    text-align: center;
-
-    margin-top: 120px;
-}
-
-
-/* =====================================================
-   CURRENT ASSET
-   ===================================================== */
-
-.currentAsset {
-    cursor: grab;
-}
-
-.currentAsset:active {
-    cursor: grabbing;
-}
-
-
-/* =====================================================
+/* =========================================================
    CONVEYOR AREA
-   ===================================================== */
+   ========================================================= */
 
 #conveyorArea {
     position: relative;
@@ -389,28 +264,17 @@ button {
     width: 900px;
     height: 235px;
 
-    margin: auto;
+    margin: 0 auto;
 
     overflow: hidden;
+
+    border-radius: 0;
 }
 
 
-/* =====================================================
-   CONVEYOR
-   ===================================================== */
-
-#movingConveyor {
-    position: absolute;
-
-    left: 0;
-    top: 0;
-
-    width: 100%;
-    height: 100%;
-}
-
-
-/* Conveyor background image */
+/* =========================================================
+   CONVEYOR IMAGE
+   ========================================================= */
 
 #conveyorImage {
     position: absolute;
@@ -429,9 +293,16 @@ button {
 }
 
 
-/* =====================================================
-   BELT / SLOTS
-   ===================================================== */
+/* =========================================================
+   MOVING BELT EFFECT
+   ========================================================= */
+
+/*
+    This creates a subtle moving stripe effect over
+    the conveyor.
+
+    The actual cards are moved by JavaScript.
+*/
 
 #belt {
     position: absolute;
@@ -445,12 +316,59 @@ button {
     z-index: 2;
 
     pointer-events: none;
+
+    overflow: hidden;
 }
 
 
-/* =====================================================
+/*
+    Moving conveyor stripes
+*/
+
+#belt::before {
+    content: "";
+
+    position: absolute;
+
+    left: 0;
+    top: 0;
+
+    width: 100%;
+    height: 100%;
+
+    background-image:
+        repeating-linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0.025) 0px,
+            rgba(255, 255, 255, 0.025) 3px,
+            rgba(0, 0, 0, 0.04) 3px,
+            rgba(0, 0, 0, 0.04) 8px
+        );
+
+    background-size: 40px 100%;
+
+    animation:
+        conveyorMotion 0.7s linear infinite;
+
+    pointer-events: none;
+}
+
+@keyframes conveyorMotion {
+
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -40px 0;
+    }
+
+}
+
+
+/* =========================================================
    ASSET CARDS
-   ===================================================== */
+   ========================================================= */
 
 .assetCard {
     position: absolute;
@@ -465,7 +383,7 @@ button {
     overflow: hidden;
 
     box-shadow:
-        0 3px 8px rgba(0, 0, 0, 0.3);
+        0 3px 8px rgba(0, 0, 0, 0.30);
 
     cursor: grab;
 
@@ -474,10 +392,25 @@ button {
     user-select: none;
 
     z-index: 10;
+
+    /*
+        JavaScript controls the X position.
+
+        The Y position is centered using
+        translateY(-50%).
+    */
+
+    transform:
+        translateY(-50%);
+
+    transition:
+        box-shadow 0.15s ease;
 }
 
 
-/* Asset image */
+/* =========================================================
+   ASSET IMAGE
+   ========================================================= */
 
 .assetCard img {
     width: 100%;
@@ -488,227 +421,417 @@ button {
     display: block;
 
     pointer-events: none;
+
+    user-select: none;
 }
 
 
-/* While dragging */
+/* =========================================================
+   CARD HOVER
+   ========================================================= */
+
+.assetCard:hover {
+    box-shadow:
+        0 5px 14px rgba(0, 0, 0, 0.40);
+}
+
+
+/* =========================================================
+   CARD WHILE DRAGGING
+   ========================================================= */
 
 .assetCard:active {
     cursor: grabbing;
 
-    transform: scale(1.05);
+    transform:
+        translateY(-50%)
+        scale(1.05);
 }
 
 .assetCard.dragging {
     cursor: grabbing;
 
-    transform: scale(1.08);
+    transform:
+        translateY(-50%)
+        scale(1.08);
 
     opacity: 0.85;
 
-    z-index: 100;
-}
-
-
-/* Correct card */
-
-.assetCard.correctCard {
-    opacity: 0.5;
-
-    pointer-events: none;
-}
-
-
-/* Wrong card */
-
-.assetCard.shake {
-    animation: shake 0.4s;
-}
-
-
-/* =====================================================
-   DROP INDICATOR
-   ===================================================== */
-
-.dropIndicator {
-    position: absolute;
-
-    bottom: 8px;
-    left: 50%;
-
-    transform: translateX(-50%);
-
-    font-size: 16px;
-    font-weight: bold;
-
-    pointer-events: none;
-
-    opacity: 0;
-
-    transition: 0.15s;
-}
-
-
-/* =====================================================
-   CORRECT FOLDER
-   ===================================================== */
-
-.folder.correctDrop {
-    background: #5cb85c;
+    z-index: 1000;
 
     box-shadow:
-        0 0 20px rgba(92, 255, 92, 0.8);
-
-    transform: scale(1.05);
-}
-
-.folder.correctDrop .dropIndicator {
-    opacity: 1;
-    color: white;
-}
-
-.folder.correctDrop .dropIndicator::after {
-    content: "✔ CORRECT";
+        0 8px 20px rgba(0, 0, 0, 0.45);
 }
 
 
-/* =====================================================
-   WRONG FOLDER
-   ===================================================== */
+/* =========================================================
+   DROP AREA
+   ========================================================= */
 
-.folder.wrongDrop {
-    background: #d9534f;
-
-    box-shadow:
-        0 0 20px rgba(255, 68, 68, 0.8);
-
-    transform: scale(1.05);
-}
-
-.folder.wrongDrop .dropIndicator {
-    opacity: 1;
-    color: white;
-}
-
-.folder.wrongDrop .dropIndicator::after {
-    content: "✖ WRONG";
-}
-
-
-/* =====================================================
-   SORTED ASSETS INSIDE FOLDERS
-   ===================================================== */
-
-.sortedAssets {
-    position: absolute;
-
-    left: 25px;
-    right: 25px;
-    bottom: 15px;
-
-    height: 75px;
+#dropArea {
+    width: 100%;
 
     display: flex;
 
     justify-content: center;
     align-items: center;
 
-    gap: 3px;
+    gap: 120px;
 
-    flex-wrap: wrap;
+    margin-top: 40px;
 
-    overflow: hidden;
-
-    pointer-events: none;
+    padding-bottom: 40px;
 }
 
 
-/* =====================================================
-   SORTED CARD
-   ===================================================== */
+/* =========================================================
+   FOLDERS
+   ========================================================= */
 
-.folder .sortedCard {
+.folder {
     position: relative;
 
-    width: 70px;
-    height: 85px;
+    width: 300px;
+    height: 180px;
 
-    padding: 3px;
-    margin: 3px;
+    display: flex;
 
-    background: white;
+    justify-content: center;
+    align-items: center;
 
-    border-radius: 6px;
+    background: transparent;
 
-    box-shadow:
-        0 2px 6px rgba(0, 0, 0, 0.3);
+    border: none;
 
-    flex-shrink: 0;
+    box-shadow: none;
+
+    cursor: pointer;
+
+    transition:
+        transform 0.2s ease,
+        filter 0.2s ease;
+}
+
+
+/* =========================================================
+   FOLDER HOVER
+   ========================================================= */
+
+.folder:hover {
+    transform: scale(1.04);
+}
+
+
+/* =========================================================
+   FOLDER IMAGE
+   ========================================================= */
+
+.folderImage {
+    width: 100%;
+    height: 100%;
+
+    object-fit: contain;
+
+    display: block;
 
     pointer-events: none;
 
-    opacity: 1;
-
-    transform: none;
+    user-select: none;
 }
 
 
-/* Sorted card image */
+/* =========================================================
+   HIDE FOLDER TEXT
+   ========================================================= */
 
-.folder .sortedCard img {
+.folder span {
+    display: none;
+}
+
+
+/* =========================================================
+   CORRECT FOLDER
+   ========================================================= */
+
+/*
+    IMPORTANT:
+
+    We DO NOT change the folder's background here.
+
+    The JavaScript keeps the normal folder image
+    when the answer is correct.
+*/
+
+.folder.correctDrop {
+    transform: scale(1.05);
+
+    filter:
+        drop-shadow(
+            0 0 12px
+            rgba(92, 255, 92, 0.85)
+        );
+}
+
+
+/* =========================================================
+   WRONG FOLDER
+   ========================================================= */
+
+/*
+    The JavaScript changes the actual image to:
+
+    Wrong_Collateral.png
+
+    or
+
+    Wrong_Non-Collateral.png
+
+    Therefore we do NOT create a red CSS background.
+
+    The red appearance comes from the replacement image.
+*/
+
+.folder.wrongDrop {
+    transform: scale(1.05);
+
+    filter:
+        drop-shadow(
+            0 0 14px
+            rgba(255, 50, 50, 0.90)
+        );
+}
+
+
+/* =========================================================
+   FOLDER RESULT ANIMATION
+   ========================================================= */
+
+.folder.correctDrop,
+.folder.wrongDrop {
+    animation:
+        folderResult 0.25s ease;
+}
+
+@keyframes folderResult {
+
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.08);
+    }
+
+    100% {
+        transform: scale(1.05);
+    }
+
+}
+
+
+/* =========================================================
+   GAME OVER
+   ========================================================= */
+
+#gameOver {
+    display: none;
+
+    min-height: 100vh;
+
+    width: 100%;
+
+    flex-direction: column;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+}
+
+#gameOver h1 {
+    font-size: 60px;
+
+    font-family: cursive;
+
+    margin-bottom: 20px;
+}
+
+#gameOver h2 {
+    font-size: 35px;
+
+    margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   CONFETTI
+   ========================================================= */
+
+#confetti {
+    position: fixed;
+
+    top: 0;
+    left: 0;
+
     width: 100%;
     height: 100%;
 
-    object-fit: contain;
-
-    display: block;
-}
-
-
-/* =====================================================
-   SMALL SORTED CARD
-   ===================================================== */
-
-.sortedCard {
-    width: 45px;
-    height: 55px;
-
-    background: white;
-
-    border-radius: 5px;
+    pointer-events: none;
 
     overflow: hidden;
 
-    box-shadow:
-        0 2px 5px rgba(0, 0, 0, 0.3);
-
-    flex-shrink: 0;
-}
-
-.sortedCard img {
-    width: 100%;
-    height: 100%;
-
-    object-fit: contain;
-
-    display: block;
+    z-index: 2000;
 }
 
 
-/* =====================================================
-   SORTED CARD RESULT
-   ===================================================== */
+.piece {
+    position: absolute;
 
-.sortedCorrect {
-    border: 3px solid #5CFF5C;
+    width: 10px;
+    height: 10px;
 
-    box-shadow:
-        0 0 10px #5CFF5C;
+    top: -20px;
+
+    animation:
+        fall 3s linear forwards;
 }
 
-.sortedWrong {
-    border: 3px solid #FF4444;
 
-    box-shadow:
-        0 0 10px #FF4444;
+@keyframes fall {
+
+    to {
+
+        transform:
+            translateY(110vh)
+            rotate(720deg);
+
+    }
+
+}
+
+
+/* =========================================================
+   SHAKE
+   ========================================================= */
+
+@keyframes shake {
+
+    0% {
+        transform:
+            translateX(0);
+    }
+
+    25% {
+        transform:
+            translateX(-10px);
+    }
+
+    50% {
+        transform:
+            translateX(10px);
+    }
+
+    75% {
+        transform:
+            translateX(-10px);
+    }
+
+    100% {
+        transform:
+            translateX(0);
+    }
+
+}
+
+.shake {
+    animation:
+        shake 0.4s;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 1000px) {
+
+    #conveyorArea {
+        width: 90vw;
+
+        height: 235px;
+    }
+
+    #dropArea {
+        gap: 50px;
+    }
+
+}
+
+
+@media (max-width: 750px) {
+
+    #topBar {
+        font-size: 22px;
+
+        padding:
+            10px;
+    }
+
+    #conveyorArea {
+        width: 95vw;
+
+        height: 210px;
+    }
+
+    .assetCard {
+        width: 95px;
+        height: 115px;
+    }
+
+    #dropArea {
+        gap: 20px;
+
+        flex-direction: column;
+    }
+
+    .folder {
+        width: 260px;
+        height: 160px;
+    }
+
+    #message {
+        font-size: 38px;
+    }
+
+}
+
+
+@media (max-width: 500px) {
+
+    #startScreen h1 {
+        font-size: 42px;
+    }
+
+    #startScreen h3 {
+        font-size: 24px;
+    }
+
+    #topBar {
+        font-size: 18px;
+    }
+
+    #conveyorArea {
+        height: 190px;
+    }
+
+    .assetCard {
+        width: 85px;
+        height: 105px;
+    }
+
+    .folder {
+        width: 230px;
+        height: 140px;
+    }
+
 }

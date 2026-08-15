@@ -4,19 +4,28 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
 
     <title>Asset Quest</title>
 
-    <link rel="stylesheet" href="style.css">
+    <link
+        rel="stylesheet"
+        href="style.css"
+    >
 
 </head>
 
+
 <body>
 
-    <!-- ========================= -->
+
+    <!-- ================================================= -->
     <!-- START SCREEN -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <div id="startScreen">
 
@@ -29,158 +38,193 @@
         </button>
 
         <p>
-            Separate the assets into the correct folders.
+            Pick the right assets!
         </p>
 
     </div>
 
 
-    <!-- ========================= -->
+
+    <!-- ================================================= -->
     <!-- GAME SCREEN -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
-    <div id="overlay">
+    <div id="gameScreen">
 
-        <div id="gameScreen">
 
-            <!-- Top Bar -->
+        <!-- ================= TOP BAR ================= -->
 
-            <div id="topBar">
+        <div id="topBar">
 
-                <div id="timer">
-                    ⏱ 40
-                </div>
-
-                <div id="score">
-                    0 / 18
-                </div>
-
-                <div id="lives">
-                    ❤️❤️❤️
-                </div>
-
+            <div id="timer">
+                ⏱ 40
             </div>
 
 
-            <!-- Floating Correct/Wrong Message -->
-
-            <div id="message"></div>
-
-
-            <!-- Card Area -->
-
-            <div id="cardContainer">
-
-                <div id="conveyorArea">
-
-                    <div id="movingConveyor">
-
-                        <img
-                            src="images/conveyor.jpg" 
-                            id="conveyorImage"
-                        >
-
-                        <div id="belt"></div>
-
-                        
-                    </div>   
-
-                </div>
+            <div id="score">
+                0 / 13
             </div>
 
-            <!-- Drop Folders -->
 
-            <div id="dropArea">
+            <div id="lives">
+                ❤️❤️❤️
+            </div>
 
-                <div
-                    class="folder"
-                    data-category="Collateralised">
+        </div>
 
-                    <img
-                            src="images/Collateral.png" 
-                            class="folderImage"
-                            
-                    >
 
-                    <div class="sortedAssets"></div>
 
-                </div>
+        <!-- ================================================= -->
+        <!-- CORRECT / WRONG MESSAGE -->
+        <!-- ================================================= -->
 
-                <div
-                    class="folder"
-                    data-category="Non-Collateralised">
+        <div id="message"></div>
 
-                    <img
-                            src="images/Non-Collateral.png" 
-                            class="folderImage"
-                            
-                    >
 
-                    <div class="sortedAssets"></div>
 
-                </div>
+        <!-- ================================================= -->
+        <!-- CONVEYOR -->
+        <!-- ================================================= -->
+
+        <div id="cardContainer">
+
+            <div id="conveyorArea">
+
+
+                <!-- Conveyor background -->
+
+                <img
+                    src="images/conveyor.jpg"
+                    id="conveyorImage"
+                    alt=""
+                >
+
+
+                <!-- Cards are inserted here by JavaScript -->
+
+                <div id="belt"></div>
+
 
             </div>
 
         </div>
 
-                    </span>
 
-                    <div class="dropIndicator"></div>
 
-                </div>
+        <!-- ================================================= -->
+        <!-- DROP FOLDERS -->
+        <!-- ================================================= -->
+
+        <div id="dropArea">
+
+
+            <!-- ================= COLLATERALISED ================= -->
+
+            <div
+                class="folder"
+                id="collateral"
+                data-category="Collateralised"
+            >
+
+                <img
+                    src="images/Collateral.png"
+                    class="folderImage"
+                    id="collateralImage"
+                    alt="Collateralised Items"
+                >
 
             </div>
 
+
+
+            <!-- ================= NON-COLLATERALISED ================= -->
+
+            <div
+                class="folder"
+                id="nonCollateral"
+                data-category="Non-Collateralised"
+            >
+
+                <img
+                    src="images/Non-Collateral.png"
+                    class="folderImage"
+                    id="nonCollateralImage"
+                    alt="Non-Collateralised Items"
+                >
+
+            </div>
+
+
         </div>
+
 
     </div>
 
 
-    <!-- ========================= -->
-    <!-- CONFETTI -->
-    <!-- ========================= -->
 
-    <div id="confetti"></div>
-
-
-    <!-- ========================= -->
+    <!-- ================================================= -->
     <!-- GAME OVER -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <div id="gameOver">
 
         <h1>🎉 Game Over</h1>
 
         <h2 id="finalScore">
-            Score : 0 / 13
+            Score: 0 / 13
         </h2>
 
         <button id="playAgain">
-            Play Again
+            PLAY AGAIN
         </button>
 
     </div>
 
 
-    <!-- ========================= -->
+
+    <!-- ================================================= -->
+    <!-- CONFETTI -->
+    <!-- ================================================= -->
+
+    <div id="confetti"></div>
+
+
+
+    <!-- ================================================= -->
     <!-- SOUND EFFECTS -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
-    <audio id="correctSound" src="sounds/correct.mp3"></audio>
-
-    <audio id="wrongSound" src="sounds/wrong.mp3"></audio>
-
-    <audio id="gameOverSound" src="sounds/gameover.mp3"></audio>
-
-    <audio id="clickSound" src="sounds/click.mp3"></audio>
+    <audio
+        id="correctSound"
+        src="sounds/correct.mp3"
+    ></audio>
 
 
-    <!-- ========================= -->
+    <audio
+        id="wrongSound"
+        src="sounds/wrong.mp3"
+    ></audio>
+
+
+    <audio
+        id="gameOverSound"
+        src="sounds/gameover.mp3"
+    ></audio>
+
+
+    <audio
+        id="clickSound"
+        src="sounds/click.mp3"
+    ></audio>
+
+
+
+    <!-- ================================================= -->
     <!-- JAVASCRIPT -->
-    <!-- ========================= -->
+    <!-- ================================================= -->
 
     <script src="script.js"></script>
+
 
 </body>
 
