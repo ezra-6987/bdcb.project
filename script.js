@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // ============================================================
 
     // Pixels per second.
-    const CARD_SPEED = 55;
+    const CARD_SPEED = 50;
 
     // Number of cards visible when game begins.
     const MAX_VISIBLE_CARDS = 7;
@@ -217,11 +217,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // New cards enter from the right.
     const CONVEYOR_ENTRY =
-        CONVEYOR_WIDTH + 20;
+        CONVEYOR_WIDTH + 1;
 
     // Card is completely outside on the left.
     const EXIT_POSITION =
-        -CARD_WIDTH - 20;
+        -CARD_WIDTH - 1;
 
     // Replacement delay after player drops a card.
     const SPAWN_DELAY = 2000;
